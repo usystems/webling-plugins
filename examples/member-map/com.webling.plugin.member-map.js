@@ -29,7 +29,7 @@ class PluginMemberMap extends HTMLElement {
 
 			const instances = await weblingAPI.member.list();
 
-			const loader = new Loader({ apiKey: 'apikey' });
+			const loader = new Loader({ apiKey: localStorage.getItem('gmapkey') || 'noKey' });
 			await loader.load();
 
 			const map = new google.maps.Map(mepEl);
