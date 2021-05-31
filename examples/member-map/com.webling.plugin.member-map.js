@@ -1,6 +1,8 @@
+import { createApp } from 'https://unpkg.com/vue@^3.0.11/dist/vue.esm-browser.js';
 import { Loader } from 'https://unpkg.com/@googlemaps/js-api-loader@^1.11.4/dist/index.esm.js'
 
 let weblingAPI;
+let config;
 
 class PluginMemberMap extends HTMLElement {
 	constructor() {
@@ -18,21 +20,21 @@ class PluginMemberMap extends HTMLElement {
 		if (this.isConnected && !this.isInitialized) {
 			this.isInitialized = true;
 
-			const mepEl = document.createElement('div');
-			mepEl.classList.add('map-el');
-			mepEl.textContent = 'Google Maps Laden ...';
+			const mapEl = document.createElement('div');
+			mapEl.classList.add('map-el');
+			mapEl.textContent = 'Google Maps Laden ...';
 
 			const style = document.createElement('style');
 			style.textContent = '.map-el { width: 100%; height: calc( 100vh - 80px ) }';
 
-			this.shadowRoot.append(style, mepEl);
+			this.shadowRoot.append(style, mapEl);
 
 			const instances = await weblingAPI.member.list();
 
-			const loader = new Loader({ apiKey: localStorage.getItem('gmapkey') || 'noKey' });
+			const loader = new Loader({ apiKey: config.get().googleMapsKey });
 			await loader.load();
 
-			const map = new google.maps.Map(mepEl);
+			const map = new google.maps.Map(mapEl);
 			const bounds = new google.maps.LatLngBounds();
 			const info = new google.maps.InfoWindow();
 
@@ -57,17 +59,49 @@ class PluginMemberMap extends HTMLElement {
 	}
 }
 
+class PluginMemberMapConfig extends HTMLElement {
+	constructor() {
+		super();
+		this.attachShadow({ mode: 'open' });
+		this.isInitialized = false;
+	}
+
+	connectedCallback() {
+		if (this.isConnected) {
+			createApp({
+				template: `<div>
+					Google Maps API Key: <input v-model="key"><br>
+					<button @click="save">Speichern</button>
+				</div>`,
+				data: () => ({
+					key: config.get().googleMapsKey || ''
+				}),
+				methods: {
+					async save() {
+						await config.set({ googleMapsKey: this.key });
+					}
+				}
+			}).mount(this.shadowRoot);
+		}
+	}
+}
+
 export default {
 	name: 'com.webling.plugin.member-map',
 	apiversion: 1,
 	pluginversion: '1.0.0',
 	hooks: [{
+		hook: 'plugin-config',
+		tagName: 'plugin-member-map-config'
+	}, {
 		hook: 'member-panel',
 		label: 'Mitglieder auf Karte',
 		tagName: 'plugin-member-map'
 	}],
-	async install(context) {
+	async onLoad(context) {
 		weblingAPI = context.weblingAPI;
+		config = context.config;
 		customElements.define('plugin-member-map', PluginMemberMap);
+		customElements.define('plugin-member-map-config', PluginMemberMapConfig);
 	}
 }
