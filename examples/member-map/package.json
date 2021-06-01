@@ -4,7 +4,7 @@
   "description": "",
   "main": "com.webling.plugin.member-map.js",
   "scripts": {
-    "serve": "browser-sync start --server --port 4004 --cors --no-open --files '*.js'"
+    "serve": "echo 'Plugin entrypoint: http://localhost:4004/com.webling.plugin.member-map.js' && browser-sync start --server --port 4004 --cors --no-open --files '*.js'"
   },
   "repository": {
     "type": "git",
