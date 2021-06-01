@@ -19,6 +19,11 @@ class PluginMemberMap extends HTMLElement {
 	async connectedCallback() {
 		if (this.isConnected && !this.isInitialized) {
 			this.isInitialized = true;
+			
+			this.shadowRoot.innerHTML = `
+				<link href="/css/plugins.css" rel="stylesheet">
+				<h1>Karte</h1>
+			`;
 
 			const mapEl = document.createElement('div');
 			mapEl.classList.add('map-el');
