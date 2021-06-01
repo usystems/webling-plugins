@@ -22,24 +22,17 @@ class PluginMemberMap extends HTMLElement {
 			
 			this.shadowRoot.innerHTML = `
 				<link href="/css/plugins.css" rel="stylesheet">
+				<style>.map-el { width: 100%; height: calc( 100vh - 80px ) }</style>
 				<h1>Karte</h1>
+				<div class="map-el">Google Maps Laden ...</div>
 			`;
-
-			const mapEl = document.createElement('div');
-			mapEl.classList.add('map-el');
-			mapEl.textContent = 'Google Maps Laden ...';
-
-			const style = document.createElement('style');
-			style.textContent = '.map-el { width: 100%; height: calc( 100vh - 80px ) }';
-
-			this.shadowRoot.append(style, mapEl);
 
 			const instances = await weblingAPI.member.list();
 
 			const loader = new Loader({ apiKey: config.get().googleMapsKey });
 			await loader.load();
 
-			const map = new google.maps.Map(mapEl);
+			const map = new google.maps.Map(this.shadowRoot.querySelector('.map-el'));
 			const bounds = new google.maps.LatLngBounds();
 			const info = new google.maps.InfoWindow();
 
