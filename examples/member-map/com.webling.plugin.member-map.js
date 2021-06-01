@@ -69,9 +69,10 @@ class PluginMemberMapConfig extends HTMLElement {
 	connectedCallback() {
 		if (this.isConnected) {
 			createApp({
-				template: `<div>
+				template: `<link href="/css/plugins.css" rel="stylesheet">
+				<div>
 					Google Maps API Key: <input v-model="key"><br>
-					<button @click="save">Speichern</button>
+					<button @click="save" class="button--primary">Speichern</button>
 				</div>`,
 				data: () => ({
 					key: config.get().googleMapsKey || ''
