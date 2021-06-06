@@ -4,7 +4,7 @@
 contains all ressources around the development of webling plugins.
 
 The Webling plugin system is not publically available yet. If you are insterested in writing a plugin, write to 
-[support@webling.ch](email://support@webling.ch)
+[support@webling.ch](mailto:support@webling.ch?subject=[GitHub]%20Plugin%20Access)
 
 ## How do Webling Plugins work
 
