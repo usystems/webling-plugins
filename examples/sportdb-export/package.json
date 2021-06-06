@@ -1,0 +1,22 @@
+{
+  "name": "sportdb-export-webling-plugin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "serve": "echo 'Plugin entrypoint: http://localhost:4004/index.js' && browser-sync start --server --port 4004 --cors --no-open --files '*.js'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/usystems/webling-plugins.git"
+  },
+  "author": "uSystems GmbH",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/usystems/webling-plugins/issues"
+  },
+  "homepage": "https://github.com/usystems/webling-plugins#readme",
+  "devDependencies": {
+    "browser-sync": "^2.26.14"
+  }
+}
