@@ -9,17 +9,17 @@ The Webling plugin system is not publically available yet. If you are instereste
 ## How do Webling Plugins work
 
 Webling provides many extention points called [hooks](#extention-points) for extention. On a high level description, a 
-plugin is a microfrontend which is inserted into Webling by a custom elements. A Plugin is represented by a ES Module which
-is dynamically imported at runtime. For each extention point, the can plugin provides a custom element which displays the
-content of the plugin. Webling provides a rich api to access the underlying datastructurs.
+plugin is a microfrontend which is inserted into Webling by a custom elements. A Plugin is represented by an ES Module which
+is dynamically imported at runtime. For each extension point, the plugin can provides a custom element which displays
+content provided by the plugin. Webling provides a rich api to access the underlying datastructurs.
 
 Since a Webling plugin is a microfrontend using native custom element as root elements, Webling plugins are framework
-agnostic. A Webling plugin can be build in your favorite frontend framework: plain JavaScript, React, VueJs, Angular, 
+agnostic. A Webling plugin can be build using your favorite frontend framework: plain JavaScript, React, VueJs, Angular, 
 Svelte or whatever you like. 
 
 ## How is a Webling Plugin structured
 
-Every programming tutorial must have a hello world example, lets look look at the hello world Webling plugin:
+Every programming tutorial must have a hello world example, lets look at the hello world Webling plugin:
 ```Javascript
 class PluginHelloWorld extends HTMLElement {
 	constructor() {
@@ -43,7 +43,7 @@ export default {
 	}
 }
 ```
-A Weblig plugin consists of two parst
+A Weblig plugin consists of two parts
 
 ### The plugin configuration
 
@@ -52,23 +52,23 @@ following keys:
 
 - `name`: String
 
-    Every plugin must must have aname. We recommend using the [Reverse Domain Name Notaion](https://en.wikipedia.org/wiki/Reverse_domain_name_notation)
+    Every plugin must have a name. We recommend using the [Reverse Domain Name Notaion](https://en.wikipedia.org/wiki/Reverse_domain_name_notation)
     to make clear there the plugin comes from.
 
 - `apiversion`: Number
 
-    A plugin must specify which which Version of the Plugin it is compatible with. Currently only the number `1` is a
+    A plugin must specify which Version of the Plugin it is compatible with. Currently, only the number `1` is a
     valid value.
     
 - `pluginversion`: String
 
-    We recommend to version a Webling plugin using [Sematic Versiong](https://semver.org).
+    We recommend versioning a Webling plugin using [Sematic Versioning](https://semver.org).
     
 - `hooks`: Array
 
-    In the hooks array it is specified how the plugin shoud extend Webling. In the example above, the tag `plugin-hello-wolrd`
-    is inserted in the member panel. In the navigation the label `Hello World is displaied. Every hook has different 
-    options. The hooks are described in [Extention Points](#extention-points)
+    In the hooks array it is specified how the plugin should extend Webling. In the example above, the tag `plugin-hello-wolrd`
+    is inserted in the member panel. In the navigation the label `Hello World is displayed. Every hook has different 
+    options. The hooks are described in [extension Points](#extention-points)
 
 - `onLoad`: Function
 
@@ -78,13 +78,13 @@ following keys:
 
 ### The custom elements 
 
-Plugins can extend webling by registring native [custom elements](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements). 
+Plugins can extend webling by registering native [custom elements](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements). 
 All custom elements provided by a plugin must start with `plugin-` to be recognised as native custom elements. To avoid 
-naming conflicts the custom elements of a plugin should contain the plugin.
+naming conflicts the custom elements of a plugin should contain the plugin name.
 
-## Extention Points
+## Extension Points
 
-Webling provides the following hooks for extension
+Webling provides the following hooks for extension:
 
 ### `plugin-config`
 
@@ -145,13 +145,12 @@ Now you can start your local dev server using
 
 `npx browser-sync start --server --cors`
 
-make sure you add the `--cors` command line argument to allow cross origin imports. Now you can add your plugin to 
+make sure you add the `--cors` command line argument to allow cross-origin imports. Now you can add your plugin to 
 your Webling with `http://localhost:3000/index.js` (if your main plugin file is not called `index.js`, use the correct
 filename).
 
 ## Example Plugins
 
-### Member Map
+### [Member Map](./examples/member-map#readme)
 
-An example plugins which shows how to visualize all members on a google map directly in webling itself. The plugin is 
-described more in deep in the [plugin readme](./examples/member-map#readme)
+An example plugins which shows how to visualize all members on a Google map directly in webling itself.
