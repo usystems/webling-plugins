@@ -7,12 +7,7 @@ let config;
 class PluginMemberMap extends HTMLElement {
 	constructor() {
 		super();
-
-		/**
-		 * Create a shadow dom root. The root is saved in this.shadowRoot
-		 */
 		this.attachShadow({ mode: 'open' });
-
 		this.isInitialized = false;
 	}
 

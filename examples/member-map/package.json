@@ -2,16 +2,16 @@
   "name": "member-map-webling-plugin",
   "version": "1.0.0",
   "description": "",
-  "main": "com.webling.plugin.member-map.js",
+  "main": "index.js",
   "scripts": {
-    "serve": "echo 'Plugin entrypoint: http://localhost:4004/com.webling.plugin.member-map.js' && browser-sync start --server --port 4004 --cors --no-open --files '*.js'"
+    "start": "echo 'Plugin entrypoint: http://localhost:4004/index.js' && browser-sync start --server --port 4004 --cors --no-open --files '*.js'"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/usystems/webling-plugins.git"
   },
-  "author": "Lukas Gamper",
-  "license": "ISC",
+  "author": "uSystems GmbH",
+  "license": "mit",
   "bugs": {
     "url": "https://github.com/usystems/webling-plugins/issues"
   },

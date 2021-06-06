@@ -4,14 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "serve": "echo 'Plugin entrypoint: http://localhost:4004/index.js' && browser-sync start --server --port 4004 --cors --no-open --files '*.js'"
+    "start": "echo 'Plugin entrypoint: http://localhost:4004/index.js' && browser-sync start --server --port 4004 --cors --no-open --files '*.js'"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/usystems/webling-plugins.git"
   },
   "author": "uSystems GmbH",
-  "license": "ISC",
+  "license": "mit",
   "bugs": {
     "url": "https://github.com/usystems/webling-plugins/issues"
   },
