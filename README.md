@@ -1,7 +1,9 @@
 # Webling Plugins
 
-[Webling](https://www.webling.ch) is a managment software for clubs and associations. It is extensible by plugins. This repo 
-contains all ressources around the development of webling plugins.
+[Webling](https://www.webling.ch) is a software for associations that perfectly matches individual requirements. Whether 
+it is a sports club, umbrella organization or a non-profit association, the software adapts easily to their needs.
+
+Webling is extensible by plugins. This repo contains all ressources around the development of webling plugins.
 
 The Webling plugin system is not publically available yet. If you are insterested in writing a plugin, write to 
 [support@webling.ch](mailto:support@webling.ch?subject=[GitHub]%20Plugin%20Access)
