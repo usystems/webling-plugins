@@ -66,6 +66,7 @@ class PluginMemberMapConfig extends HTMLElement {
 				<div>
 					Google Maps API Key: <input v-model="key"><br>
 					<button @click="save" class="button--primary">Speichern</button>
+					<button @click="close" class="button">Schliessen</button>
 				</div>`,
 				data: () => ({
 					key: config.get().googleMapsKey || ''
@@ -73,6 +74,10 @@ class PluginMemberMapConfig extends HTMLElement {
 				methods: {
 					async save() {
 						await config.set({ googleMapsKey: this.key });
+						this.close();
+					},
+					close: () => {
+						this.shadowRoot.dispatchEvent(new CustomEvent('close-dialog', { bubbles: true, composed: true }));
 					}
 				}
 			}).mount(this.shadowRoot);
