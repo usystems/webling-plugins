@@ -199,9 +199,9 @@ filename).
 
 ## Plugin Hosting
 
-Since a Plugin must be publicly available, we recommend hosting Webling plugins on GitHub. Since GitHub does not like
-if you use github raw files in production, there are many services providing a CDN for github files. For example
-[raw.githack.com](https://raw.githack.com/) serves your files from CloudFlare's CDN.
+Since a Plugin must be publicly available, we recommend hosting Webling plugins on GitHub. Since GitHub is not a content
+delivery network, you need a cdn to deliver your plugin with the correct headers. You can use [raw.githack.com](https://raw.githack.com/).
+A more detaild explanation on how to deliver your plugin correctly look at this [medium post](https://lukasgamper.medium.com/how-to-import-files-directly-from-github-1a41c72a3ad3).
 
 ## Example Plugins
 
