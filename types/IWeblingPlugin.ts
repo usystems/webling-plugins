@@ -26,6 +26,12 @@ export default interface IWeblingPlugin {
 	} | {
 		hook: 'member-dialog-sidebar' | 'plugin-config';
 		tagName: string;
+	} | {
+		hook: 'member-grid-menu';
+		label: string;
+		tagName: string;
+		dialogTitle?: string;
+		dialogWidth?: number;
 	})[];
 
 	/**
