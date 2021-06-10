@@ -44,22 +44,17 @@ class PluginMemberMapPanel extends HTMLElement {
 	constructor() {
 		super();
 		this.attachShadow({ mode: 'open' });
-		this.isInitialized = false;
+		this.shadowRoot.innerHTML = `
+			<link href="/css/plugins.css" rel="stylesheet">
+			<style>.map-el { width: 100%; height: calc( 100vh - 80px ) }</style>
+			<h1>Karte</h1>
+			<div class="map-el">Google Maps Laden ...</div>
+		`;
 	}
 
 	async connectedCallback() {
-		if (this.isConnected && !this.isInitialized) {
-			this.isInitialized = true;
-
-			this.shadowRoot.innerHTML = `
-				<link href="/css/plugins.css" rel="stylesheet">
-				<style>.map-el { width: 100%; height: calc( 100vh - 80px ) }</style>
-				<h1>Karte</h1>
-				<div class="map-el">Google Maps Laden ...</div>
-			`;
-
+		if (this.isConnected) {
 			const instances = await weblingAPI.member.list();
-
 			await showGoogleMaps(this.shadowRoot, instances);
 		}
 	}
@@ -71,18 +66,20 @@ class PluginMemberMapGrid extends HTMLElement {
 	constructor() {
 		super();
 		this.attachShadow({ mode: 'open' });
-	}
-
-	async attributeChangedCallback() {
 		this.shadowRoot.innerHTML = `
 			<link href="/css/plugins.css" rel="stylesheet">
 			<style>.map-el { width: 100%; height: calc( 100vh - 180px ) }</style>
 			<div class="map-el">Google Maps Laden ...</div>
 		`;
+	}
 
-		const memberIds = this.getAttribute('member-ids').split(',').map(strId => parseInt(strId, 10));
+	async attributeChangedCallback() {
+		const memberIds = this.getAttribute('member-ids')
+			.split(',')
+			.map(strId => parseInt(strId, 10))
+			.filter(id => !isNaN(id) && id !== 0)
+		;
 		const instances = await Promise.all(memberIds.map(memberId => weblingAPI.member.load(memberId)));
-
 		await showGoogleMaps(this.shadowRoot, instances);
 	}
 }
