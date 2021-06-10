@@ -20,11 +20,11 @@ export default interface IWeblingPlugin {
 	 * Hooks, where the plugin should be displayed
 	 */
 	hooks: ({
-		hook: 'member-panel';
+		hook: 'member-panel' | 'accounting-panel' | 'document-panel';
 		label: string;
 		tagName: string;
 	} | {
-		hook: 'plugin-config';
+		hook: 'member-dialog-sidebar' | 'plugin-config';
 		tagName: string;
 	})[];
 
