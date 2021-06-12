@@ -6,7 +6,7 @@
 import type IWeblingPluginInstanceData from './IWeblingPluginInstanceData';
 import type IWeblingPluginInstanceUpdate from './IWeblingPluginInstanceUpdate';
 
-export default interface IWeblingPluginAPI {
+export default interface IWeblingPluginInstances {
 	[instanceType: string]: {
 		create(member: IWeblingPluginInstanceUpdate): Promise<number>;
 		load(id: number): Promise<IWeblingPluginInstanceData>;

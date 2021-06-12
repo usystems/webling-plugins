@@ -131,7 +131,7 @@ item in the member panel.
 After a Webling plugin is imported, the `onLoad` callback is called. Webling provides the plugin context as the first argument.
 The context contains the following apis:
 
-### `context.weblingAPI`
+### `context.instances`
 
 ### `context.http`
 

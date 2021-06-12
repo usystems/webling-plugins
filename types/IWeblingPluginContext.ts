@@ -3,13 +3,13 @@
  * @copyright uSystems GmbH, www.usystems.ch
  */
 
-import type IWeblingPluginAPI from './IWeblingPluginAPI';
+import type IWeblingPluginInstances from './IWeblingPluginInstances';
 import type IWeblingPluginHttp from './IWeblingPluginHttp';
 import type IWeblingPluginConfig from './IWeblingPluginConfig';
 import type IWeblingPluginState from './IWeblingPluginState';
 
 export default interface IWeblingPluginContext {
-	weblingAPI: IWeblingPluginAPI;
+	instances: IWeblingPluginInstances;
 	http: IWeblingPluginHttp;
 	config: IWeblingPluginConfig;
 	state: IWeblingPluginState;

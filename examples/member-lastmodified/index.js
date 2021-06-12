@@ -1,4 +1,4 @@
-let weblingAPI;
+let instances;
 
 class PluginMemberLastmodified extends HTMLElement {
 
@@ -26,7 +26,7 @@ class PluginMemberLastmodified extends HTMLElement {
 async function updateElement(el) {
 	let memberId = el.getAttribute('member-id');
 	if (/^[1-9]\d*$/.test(memberId)) {
-		let member = await weblingAPI.member.load(parseInt(memberId, 10));
+		let member = await instances.member.load(parseInt(memberId, 10));
 		let lastmodified = member.meta.lastmodified;
 		if (lastmodified instanceof Date) {
 			el.shadowRoot.querySelector('.time').textContent = lastmodified.toLocaleDateString(
@@ -46,7 +46,7 @@ export default {
 		tagName: 'plugin-member-lastmodified'
 	}],
 	async onLoad(context) {
-		weblingAPI = context.weblingAPI;
+		instances = context.instances;
 		customElements.define('plugin-member-lastmodified', PluginMemberLastmodified);
 	}
 }

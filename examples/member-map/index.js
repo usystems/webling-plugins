@@ -1,8 +1,8 @@
 import { createApp } from 'https://unpkg.com/vue@^3.0.11/dist/vue.esm-browser.js';
 import { Loader } from 'https://unpkg.com/@googlemaps/js-api-loader@^1.11.4/dist/index.esm.js'
 
-let weblingAPI;
-let config;
+let weblingInstances;
+let pluginConfig;
 
 class PluginMemberMapConfig extends HTMLElement {
 	constructor() {
@@ -24,11 +24,11 @@ class PluginMemberMapConfig extends HTMLElement {
 					</div>
 				</div>`,
 				data: () => ({
-					key: config.get().googleMapsKey || ''
+					key: pluginConfig.get().googleMapsKey || ''
 				}),
 				methods: {
 					async save() {
-						await config.set({ googleMapsKey: this.key });
+						await pluginConfig.set({ googleMapsKey: this.key });
 						this.close();
 					},
 					close: () => {
@@ -54,7 +54,7 @@ class PluginMemberMapPanel extends HTMLElement {
 
 	async connectedCallback() {
 		if (this.isConnected) {
-			const instances = await weblingAPI.member.list();
+			const instances = await weblingInstances.member.list();
 			await showGoogleMaps(this.shadowRoot, instances);
 		}
 	}
@@ -79,13 +79,13 @@ class PluginMemberMapGrid extends HTMLElement {
 			.map(strId => parseInt(strId, 10))
 			.filter(id => !isNaN(id) && id !== 0)
 		;
-		const instances = await Promise.all(memberIds.map(memberId => weblingAPI.member.load(memberId)));
+		const instances = await Promise.all(memberIds.map(memberId => weblingInstances.member.load(memberId)));
 		await showGoogleMaps(this.shadowRoot, instances);
 	}
 }
 
 async function showGoogleMaps(shadowRoot, instances) {
-	const loader = new Loader({ apiKey: config.get().googleMapsKey });
+	const loader = new Loader({ apiKey: pluginConfig.get().googleMapsKey });
 	await loader.load();
 
 	const map = new google.maps.Map(shadowRoot.querySelector('.map-el'));
@@ -130,8 +130,8 @@ export default {
 		tagName: 'plugin-member-map-grid'
 	}],
 	async onLoad(context) {
-		weblingAPI = context.weblingAPI;
-		config = context.config;
+		weblingInstances = context.instances;
+		pluginConfig = context.config;
 		customElements.define('plugin-member-map-config', PluginMemberMapConfig);
 		customElements.define('plugin-member-map-panel', PluginMemberMapPanel);
 		customElements.define('plugin-member-map-grid', PluginMemberMapGrid);
