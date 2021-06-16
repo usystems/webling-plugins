@@ -125,7 +125,13 @@ item in the member panel.
 - `hook`: the name of the hook, here 'member-panel'.
 - `label`: the label of the menu item, which is shown in the member navigation. 
 - `tagName`: the name of the custom elements representing the new function.
-		
+
+### `member-grid-menu`
+
+### `accounting-panel`
+
+### `document-panel`
+
 ## The Plugin Context
 
 After a Webling plugin is imported, the `onLoad` callback is called. Webling provides the plugin context as the first argument.
