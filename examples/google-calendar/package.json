@@ -1,0 +1,22 @@
+{
+  "name": "google-calendar-webling-plugin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "echo 'Plugin entrypoint: http://localhost:4008/index.js' && browser-sync start --server --port 4008 --cors --no-open --files '*.js'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/usystems/webling-plugins.git"
+  },
+  "author": "uSystems GmbH",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/usystems/webling-plugins/issues"
+  },
+  "homepage": "https://github.com/usystems/webling-plugins#readme",
+  "devDependencies": {
+    "browser-sync": "^2.26.14"
+  }
+}
