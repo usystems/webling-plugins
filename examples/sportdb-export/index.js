@@ -20,6 +20,7 @@ POS NAME            LÄNGE   PFLICHT BEISPIEL
 13  KLASSE/GRUPPE   25      nein    Klasse 3c oder Jugendriege
  */
 
+/** @type {IWeblingPluginContext} */
 let weblingContext;
 
 class SportdbExportDialog extends HTMLElement {
@@ -147,6 +148,9 @@ export default {
 		dialogWidth: 500,
 		tagName: 'plugin-sportdb-export-dialog'
 	}],
+	/**
+	 * @param {IWeblingPluginContext} context
+	 */
 	async onLoad(context) {
 		weblingContext = context;
 		customElements.define('plugin-sportdb-export-dialog', SportdbExportDialog);
