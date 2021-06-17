@@ -109,8 +109,12 @@ This hook allows the plugin to provide a configuration dialog. An example of a c
 
 #### Options
 
-- `hook`: the name of the hook, here 'plugin-config'.
-- `tagName`: the name of the custom elements representing the configuration interface
+```Javascript
+{
+  hook: 'plugin-config', // the name of the hook, here 'member-panel'.
+  tagName: 'plugin-my-plugin-configuration' // the name of the custom elements representing the configuration interface
+}
+```
 
 #### Events
 
@@ -123,9 +127,13 @@ item to the member panel.
 
 #### Options
 
-- `hook`: the name of the hook, here 'member-panel'.
-- `label`: the label of the menu item, which is shown in the member navigation. 
-- `tagName`: the name of the custom element representing the new page.
+```Javascript
+{
+  hook: 'member-panel', // the name of the hook, here 'member-panel'.
+  label: 'My Plugin Page', // the label of the menu item, which is shown in the member navigation. 
+  tagName: 'plugin-my-custom-element' // the name of the custom element representing the new page.
+}
+```
 
 ### `member-grid-menu`
 
