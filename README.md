@@ -10,7 +10,7 @@ The Webling plugin system is not publically available yet. If you are interested
 
 ## How does a Webling plugin work
 
-Webling provides many extension points called [hooks](#extension-points) for extension. On a high level description, a 
+Webling provides many extension points called [hooks](#hooks-extension-points) for extension. On a high level description, a 
 plugin is a micro frontend which is inserted into Webling by adding custom elements. A plugin is an ES Module which
 is dynamically imported at runtime. For each extension point, the plugin can provide a custom element which displays
 content provided by the plugin. Webling provides an API to access the underlying data structure.
@@ -71,7 +71,7 @@ following keys:
 
     The hooks array specifies how the plugin extends Webling. In the example above, the tag `plugin-hello-world`
     is inserted into the member panel. In the navigation a new menu item with the label `Hello World` is displayed. 
-    Every hook has different options. The hooks are described in [extension points](#extension-points)
+    Every hook has different options. The hooks are described in [extension points](#hooks-extension-points)
 
 - `onLoad`: Function
 
@@ -88,7 +88,7 @@ Plugins can extend webling by registering native [custom elements](https://devel
 All custom elements provided by a plugin must start with `plugin-` to be recognised as native custom elements. To avoid 
 naming conflicts the custom elements of a plugin should be unique and contain the plugin name.
 
-## Extension Points
+## Hooks (Extension Points)
 
 To provide Webling with the necessary information to load the plugin, every extension point has a configuration with the name of the 
 extension point (called hook) and all needed context information. 
