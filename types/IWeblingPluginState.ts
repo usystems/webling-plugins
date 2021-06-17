@@ -5,5 +5,5 @@
 
 export default interface IWeblingPluginState {
 	get(): any;
-	get(state: any): Promise<void>;
+	set(state: any): Promise<void>;
 }
