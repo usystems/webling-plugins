@@ -3,25 +3,26 @@
 [Webling](https://www.webling.ch) is a software for associations that perfectly matches individual requirements. Whether 
 it is a sports club, umbrella organization or a non-profit association, the software adapts easily to their needs.
 
-Webling is extensible by plugins. This repo contains all ressources around the development of webling plugins.
+Webling is extensible by plugins. This repo contains all resources around the development of webling plugins.
 
-The Webling plugin system is not publically available yet. If you are insterested in writing a plugin, write to 
+The Webling plugin system is not publically available yet. If you are interested in writing a plugin, contact us at 
 [support@webling.ch](mailto:support@webling.ch?subject=[GitHub]%20Plugin%20Access)
 
-## How does a Webling Plugin work
+## How does a Webling plugin work
 
-Webling provides many extention points called [hooks](#extension-points) for extention. On a high level description, a 
-plugin is a microfrontend which is inserted into Webling by a custom elements. A Plugin is represented by an ES Module which
-is dynamically imported at runtime. For each extension point, the plugin can provides a custom element which displays
-content provided by the plugin. Webling provides a rich api to access the underlying datastructurs.
+Webling provides many extension points called [hooks](#extension-points) for extension. On a high level description, a 
+plugin is a micro frontend which is inserted into Webling by adding custom elements. A plugin is an ES Module which
+is dynamically imported at runtime. For each extension point, the plugin can provide a custom element which displays
+content provided by the plugin. Webling provides an API to access the underlying data structure.
 
-Since a Webling plugin is a microfrontend using native custom element as root elements, Webling plugins are framework
+Since a Webling plugin is a micro frontend using native custom element as root elements, Webling plugins are framework
 agnostic. A Webling plugin can be build using your favorite frontend framework: plain JavaScript, React, VueJs, Angular, 
 Svelte or whatever you like. 
 
-## How is a Webling Plugin structured
+## How is a Webling plugin structured
 
-Every programming tutorial must have a hello world example, lets look at the hello world Webling plugin:
+Every programming tutorial must have a hello world example. Lets look at the hello world Webling plugin:
+
 ```Javascript
 class PluginHelloWorld extends HTMLElement {
 	constructor() {
@@ -38,46 +39,46 @@ export default {
 	hooks: [{
 		hook: 'member-panel',
 		label: 'Hello World',
-		tagName: 'plugin-hello-wolrd'
+		tagName: 'plugin-hello-world'
 	}],
 	onLoad(context) {
-		customElements.define('plugin-hello-wolrd', PluginHelloWorld);
+		customElements.define('plugin-hello-world', PluginHelloWorld);
 	}
 }
 ```
-A Weblig plugin consists of two parts
 
-### The Plugin Configuration
+A Weblig plugin consists of two parts: the _configuration_ and the _custom elements_:
+
+### The Plugin configuration
 
 The plugin must be a valid ES Module. The plugin configuration is exported as the default export. It must contain the 
 following keys:
 
 - `name`: String
 
-    Every plugin must have a name. We recommend using the [Reverse Domain Name Notaion](https://en.wikipedia.org/wiki/Reverse_domain_name_notation)
-    to make clear there the plugin comes from.
+    Every plugin must have a unique name. We recommend using the [Reverse Domain Name Notaion](https://en.wikipedia.org/wiki/Reverse_domain_name_notation)
+    to make clear where the plugin comes from.
 
 - `apiversion`: Number
 
-    A plugin must specify which Version of the Plugin it is compatible with. Currently, only the number `1` is a
-    valid value.
+    A plugin must specify with which version of the API it is compatible. Currently, only the version `1` is supported.
     
 - `pluginversion`: String
 
-    We recommend versioning a Webling plugin using [Sematic Versioning](https://semver.org).
+    We recommend versioning the plugin using [Semantic Versioning](https://semver.org).
     
 - `hooks`: Array
 
-    In the hooks array it is specified how the plugin should extend Webling. In the example above, the tag `plugin-hello-wolrd`
-    is inserted in the member panel. In the navigation the label `Hello World is displayed. Every hook has different 
-    options. The hooks are described in [extension Points](#extension-points)
+    The hooks array specifies how the plugin extends Webling. In the example above, the tag `plugin-hello-world`
+    is inserted into the member panel. In the navigation a new menu item with the label `Hello World` is displayed. 
+    Every hook has different options. The hooks are described in [extension points](#extension-points)
 
 - `onLoad`: Function
 
     After Webling is loaded, all plugins are dynamically imported and the `onLoad` of each plugin is called. The `onLoad`
     function gets the plugin context as an argument. The context is described in [Starting a Plugin](#the-plugin-context).
     
-    The on load callback should register all custom elements provided in the hooks.
+    The `onLoad` callback should register all custom elements provided in the hooks.
     
     The `onLoad` function can return a Promise if it needs to execute asynchronous actions.
 
@@ -85,14 +86,14 @@ following keys:
 
 Plugins can extend webling by registering native [custom elements](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements). 
 All custom elements provided by a plugin must start with `plugin-` to be recognised as native custom elements. To avoid 
-naming conflicts the custom elements of a plugin should contain the plugin name.
+naming conflicts the custom elements of a plugin should be unique and contain the plugin name.
 
 ## Extension Points
 
-To provide Webling with the necessary information, every extension point has a configuration where the name of the 
-extension point (called hook) and all needed context information are provided. 
+To provide Webling with the necessary information to load the plugin, every extension point has a configuration with the name of the 
+extension point (called hook) and all needed context information. 
 
-Some extension points provide some event listeners. For example, the `plugin-config` hook provides an event listener to 
+Some extension points provide event listeners. For example, the `plugin-config` hook provides an event listener to 
 close the configuration dialog. These listeners are called using native events:
 
 ```javascript
@@ -103,8 +104,8 @@ Webling provides the following hooks for extension:
 
 ### `plugin-config`
 
-This Hook allows the plugin to provide a Configuration panel. An example on how a configuration panel can look like, 
-look in the [member map example plugin](./examples/member-map#readme)
+This hook allows the plugin to provide a configuration dialog. An example of a configuration dialog can be found here:
+[member map example plugin](./examples/member-map#readme)
 
 #### Options
 
@@ -117,14 +118,14 @@ look in the [member map example plugin](./examples/member-map#readme)
 
 ### `member-panel`
 
-If you want to extend the member panel with a whole new function, this hook gives you the possibility to add a navigation
-item in the member panel.
+If you want to extend the member panel with a new page, this hook gives you the possibility to add a navigation
+item to the member panel.
 
 #### Options
 
 - `hook`: the name of the hook, here 'member-panel'.
 - `label`: the label of the menu item, which is shown in the member navigation. 
-- `tagName`: the name of the custom elements representing the new function.
+- `tagName`: the name of the custom element representing the new page.
 
 ### `member-grid-menu`
 
@@ -148,37 +149,35 @@ The context contains the following apis:
 
 ### `context.config`
 
-`context.confit` provides an interface to the plugin configuration. If the plugin needs specific data like API keys for
-Google Maps, or some formatting options, you should store these informations in the configuration object. The configuration
-must be serializable The plugin configuration should be managed in an interface which is displayed in the `plugin-config` 
+`context.config` provides an interface to the plugin configuration. If the plugin needs specific data like API keys for
+Google Maps, or some formatting options, you should store these in the configuration object. The configuration
+must be serializable. The plugin configuration should be managed in an interface which is displayed in the `plugin-config` 
 hook.
 
-The plugin configuration is only writable by the administrator of the Webling store, but readable fore every user.
+The plugin configuration is only writable by the administrator of the Webling, but readable for every user.
 
 The configuration object has the following structure:
 
-  - `get(): Object`: `context.config.get()` returns the configuration of a=the plugin. It returns the object which has last
-  been written by `context.config.get(config)`.
-  - `set(config: Object): Promise`: writes a new configuration to the plugin. The returned promise resolves if the 
+  - `get(): Object`: `context.config.get()` returns the current configuration of the plugin
+  - `set(config: Object): Promise`: updates the plugin configuration. The returned promise resolves if the 
   configuration was saved successfully.
 
 ### `context.state`
 
 `context.state` provides an interface to the plugin state. The state can be any serializable object. In contrast to the
-coinfiguration it can be read and written by all users.
+configuration it can be read and written by all users.
 
 The state object has the following structure:
 
-  - `get(): any`: `context.state.get()` returns the thest of the plugin. It returns the object which has last
-  been written by `context.state.get(state)`.
-  - `set(state: any): Promise`: writes a new state to the plugin. The returned promise resolves if the state was 
+  - `get(): any`: `context.state.get()` returns the current state of the plugin.
+  - `set(state: any): Promise`: updates the plugin state. The returned promise resolves if the state was 
   saved successfully.
 
 ### `context.language`
 
 The language, the Webling user is using. The following languages are possible:
 
-- `de`(German) This is the default language the vast majority of users are using.
+- `de`(German) This is the default language of the vast majority of users.
 - `en`(English)
 - `fr`(French)
 
@@ -200,14 +199,14 @@ Now you can start your local dev server using
 `npx browser-sync start --server --cors`
 
 make sure you add the `--cors` command line argument to allow cross-origin imports. Now you can add your plugin to 
-your Webling with `http://localhost:3000/index.js` (if your main plugin file is not called `index.js`, use the correct
+your Webling with the url `http://localhost:3000/index.js` (if your main plugin file is not called `index.js`, use the correct
 filename).
 
 ## Plugin Hosting
 
 Since a Plugin must be publicly available, we recommend hosting Webling plugins on GitHub. Since GitHub is not a content
 delivery network, you need a cdn to deliver your plugin with the correct headers. You can use [raw.githack.com](https://raw.githack.com/).
-A more detaild explanation on how to deliver your plugin correctly look at this [medium post](https://lukasgamper.medium.com/how-to-import-files-directly-from-github-1a41c72a3ad3).
+A more detailed explanation on how to deliver your plugin correctly look at this [medium post](https://lukasgamper.medium.com/how-to-import-files-directly-from-github-1a41c72a3ad3).
 
 ## Example Plugins
 
