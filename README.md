@@ -198,11 +198,7 @@ If you start from scratch, first initialize npm using
 
 `npm init`
 
-and install `browser-sync` with
-
-`npm install --save-dev browser-sync`
-
-Now you can start your local dev server using
+Now you can start `browser-sync` as a  local dev server using
 
 `npx browser-sync start --server --cors`
 

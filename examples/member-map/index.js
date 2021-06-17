@@ -8,7 +8,6 @@ class PluginMemberMapConfig extends HTMLElement {
 	constructor() {
 		super();
 		this.attachShadow({ mode: 'open' });
-		this.isInitialized = false;
 	}
 
 	connectedCallback() {
@@ -120,7 +119,7 @@ export default {
 		tagName: 'plugin-member-map-config',
 		dialogTitle: 'Mitglieder auf einer Karte anzeigen Plugin',
 	}, {
-		hook: 'member-panel',
+		hook: 'member-panel-navigation',
 		label: 'Mitglieder auf Karte',
 		tagName: 'plugin-member-map-panel'
 	}, {

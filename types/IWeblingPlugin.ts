@@ -20,7 +20,7 @@ export default interface IWeblingPlugin {
 	 * Hooks, where the plugin should be displayed
 	 */
 	hooks: ({
-		hook: 'member-panel' | 'accounting-panel' | 'document-panel';
+		hook: 'member-panel-navigation' | 'accounting-panel-navigation' | 'document-panel-navigation';
 		label: string;
 		tagName: string;
 	} | {
