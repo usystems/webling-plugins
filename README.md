@@ -111,8 +111,8 @@ This hook allows the plugin to provide a configuration dialog. An example of a c
 
 ```Javascript
 {
-  hook: 'plugin-config', // the name of the hook, here 'member-panel'.
-  tagName: 'plugin-my-plugin-configuration' // the name of the custom elements representing the configuration interface
+  hook: 'plugin-config', // the name of the hook, here 'plugin-config'.
+  tagName: 'plugin-my-plugin-configuration' // the name of the custom element representing the configuration interface
 }
 ```
 
