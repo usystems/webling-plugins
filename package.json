@@ -2,13 +2,23 @@
   "name": "webling-plugin-types",
   "version": "1.0.0",
   "description": "Interfaces for Webling Plugins",
-  "main": "IWeblingPlugin.ts",
+  "author": "uSystems GmbH",
+  "license": "MIT",
+  "module": "types/IWeblingPlugin.ts",
+  "exports": {
+    ".": {
+      "import": "./types/IWeblingPlugin.ts"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/usystems/webling-plugins.git"
   },
-  "author": "uSystems GmbH",
-  "license": "mit",
+  "files": [
+    "types",
+    "LICENSE",
+    "README.md"
+  ],
   "bugs": {
     "url": "https://github.com/usystems/webling-plugins/issues"
   },
