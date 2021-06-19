@@ -3,7 +3,7 @@
 [Webling](https://www.webling.ch) is a software for associations that perfectly matches individual requirements. Whether 
 it is a sports club, umbrella organization or a non-profit association, the software adapts easily to their needs.
 
-Webling is extensible by plugins. This repo contains all resources around the development of webling plugins.
+Webling is extensible by plugins. This repo contains all resources around the development of Webling plugins.
 
 The Webling plugin system is not publically available yet. If you are interested in writing a plugin, contact us at 
 [support@webling.ch](mailto:support@webling.ch?subject=[GitHub]%20Plugin%20Access)
@@ -51,8 +51,9 @@ A Weblig plugin consists of two parts: the _configuration_ and the _custom eleme
 
 ### The Plugin configuration
 
-The plugin must be a valid ES Module. The plugin configuration is exported as the default export. It must contain the 
-following keys:
+The plugin must be a valid ES Module. The plugin configuration is exported as the default export and must implement the 
+[`IWeblingPlugin`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L87) interface. It must 
+contain the following keys:
 
 - `name`: String
 
@@ -120,7 +121,7 @@ This hook allows the plugin to provide a configuration dialog. An example of a c
 
 - `close-dialog`: close the config dialog
 
-### `member-panel`
+### `member-panel-navigation`
 
 If you want to extend the member panel with a new page, this hook gives you the possibility to add a navigation
 item to the member panel.
@@ -137,18 +138,21 @@ item to the member panel.
 
 ### `member-grid-menu`
 
-### `accounting-panel`
+### `accounting-panel-navigation`
 
-### `document-panel`
+### `document-panel-navigation`
 
 ## The Plugin Context
 
-After a Webling plugin is imported, the `onLoad` callback is called. Webling provides the plugin context as the first argument.
-The context contains the following apis:
+After a Webling plugin is imported, the `onLoad` callback is called. Webling provides the plugin context as the only argument.
+The context implements the [`IWeblingPluginContext`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L79)
+interface and contains the following apis:
 
 ### `context.instances`
+[`IWeblingPluginInstances`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L20)
 
 ### `context.http`
+[`IWeblingPluginHttp`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L62)
 
 	- `get(url: string): Promise`
 	- `post(url: string, data?: any): Promise`
@@ -157,7 +161,8 @@ The context contains the following apis:
 
 ### `context.config`
 
-`context.config` provides an interface to the plugin configuration. If the plugin needs specific data like API keys for
+`context.config` implements [`IWeblingPluginConfig`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L69)
+and provides an interface to the plugin configuration. If the plugin needs specific data like API keys for
 Google Maps, or some formatting options, you should store these in the configuration object. The configuration
 must be serializable. The plugin configuration should be managed in an interface which is displayed in the `plugin-config` 
 hook.
@@ -172,7 +177,8 @@ The configuration object has the following structure:
 
 ### `context.state`
 
-`context.state` provides an interface to the plugin state. The state can be any serializable object. In contrast to the
+`context.state`  implements [`IWeblingPluginState`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L74)
+and provides an interface to the plugin state. The state can be any serializable object. In contrast to the
 configuration it can be read and written by all users.
 
 The state object has the following structure:
@@ -194,17 +200,20 @@ The language, the Webling user is using. The following languages are possible:
 For plugin development, you need a local server to provide your plugin since browsers do not allow the import of local 
 files out of security reasons. We propose [`browser-sync`](https://browsersync.io/) to develop your local plugin.
 
-If you start from scratch, first initialize npm using
-
-`npm init`
-
-Now you can start `browser-sync` as a  local dev server using
+Now you can install and start `browser-sync` as a  local dev server using
 
 `npx browser-sync start --server --cors`
 
 make sure you add the `--cors` command line argument to allow cross-origin imports. Now you can add your plugin to 
 your Webling with the url `http://localhost:3000/index.js` (if your main plugin file is not called `index.js`, use the correct
 filename).
+
+### Typescript
+
+If you write a plugin in typescript you can install the webling typings with
+
+`npm install webling-plugin-typings`
+
 
 ## Plugin Hosting
 
