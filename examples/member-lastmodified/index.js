@@ -1,3 +1,6 @@
+/**
+ * @type IWeblingPluginInstances
+ */
 let instances;
 
 class PluginMemberLastmodified extends HTMLElement {

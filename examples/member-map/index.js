@@ -1,7 +1,14 @@
 import { createApp } from 'https://unpkg.com/vue@^3.0.11/dist/vue.esm-browser.js';
 import { Loader } from 'https://unpkg.com/@googlemaps/js-api-loader@^1.11.4/dist/index.esm.js'
 
+/**
+ * @type IWeblingPluginInstances
+ */
 let weblingInstances;
+
+/**
+ * @type IWeblingPluginConfig
+ */
 let pluginConfig;
 
 class PluginMemberMapConfig extends HTMLElement {
@@ -14,10 +21,10 @@ class PluginMemberMapConfig extends HTMLElement {
 		if (this.isConnected) {
 			createApp({
 				template: `<link href="/css/plugins.css" rel="stylesheet">
-				<div style="padding-top: 20px">
+				<div>
 					<div>Google Maps API Key</div> 
 					<div><input style="width: 420px" v-model="key" placeholder="Google Maps API Key"></div>
-					<div style="position: absolute; bottom: 20px">
+					<div>
 						<button @click="save" class="button--primary">Speichern</button>
 						<button @click="close" class="button">Schliessen</button>
 					</div>

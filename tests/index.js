@@ -1,10 +1,21 @@
 import { createApp } from 'https://unpkg.com/vue@^3.0.11/dist/vue.esm-browser.js';
-import { Loader } from 'https://unpkg.com/@googlemaps/js-api-loader@^1.11.4/dist/index.esm.js'
 
+/**
+ * @type IWeblingPluginInstances
+ */
 let weblingInstances;
+
+/**
+ * @type IWeblingPluginConfig
+ */
 let pluginConfig;
 
-class PluginMemberMapConfig extends HTMLElement {
+/**
+ * @type IWeblingPluginState
+ */
+let pluginState;
+
+class PluginTestConfig extends HTMLElement {
 	constructor() {
 		super();
 		this.attachShadow({ mode: 'open' });
@@ -13,23 +24,20 @@ class PluginMemberMapConfig extends HTMLElement {
 	connectedCallback() {
 		if (this.isConnected) {
 			createApp({
-				template: `<link href="/css/plugins.css" rel="stylesheet">
-				<div style="padding-top: 20px">
-					<div>Google Maps API Key</div> 
-					<div><input style="width: 420px" v-model="key" placeholder="Google Maps API Key"></div>
-					<div style="position: absolute; bottom: 20px">
-						<button @click="save" class="button--primary">Speichern</button>
+				template: `
+					<link href="/css/plugins.css" rel="stylesheet">
+					<div>
+						<button @click="count++" class="button--primary">count in config: {{ count }}</button>
 						<button @click="close" class="button">Schliessen</button>
 					</div>
-				</div>`,
-				data: () => ({
-					key: pluginConfig.get().googleMapsKey || ''
-				}),
+				`,
+				computed: {
+					count: {
+						get() { return pluginConfig.get().count || 0; },
+						async set(count) { await pluginConfig.set({ count }); }
+					}
+				},
 				methods: {
-					async save() {
-						await pluginConfig.set({ googleMapsKey: this.key });
-						this.close();
-					},
 					close: () => {
 						this.shadowRoot.dispatchEvent(new CustomEvent('close-dialog', { bubbles: true, composed: true }));
 					}
@@ -39,75 +47,83 @@ class PluginMemberMapConfig extends HTMLElement {
 	}
 }
 
-class PluginMemberMapPanel extends HTMLElement {
+class PluginTestNavigation extends HTMLElement {
 	constructor() {
 		super();
 		this.attachShadow({ mode: 'open' });
-		this.shadowRoot.innerHTML = `
-			<link href="/css/plugins.css" rel="stylesheet">
-			<style>.map-el { width: 100%; height: calc( 100vh - 80px ) }</style>
-			<h1>Karte</h1>
-			<div class="map-el">Google Maps Laden ...</div>
-		`;
 	}
 
-	async connectedCallback() {
+	connectedCallback() {
 		if (this.isConnected) {
-			const instances = await weblingInstances.member.list();
-			await showGoogleMaps(this.shadowRoot, instances);
+			createApp({
+				template: `
+					<link href="/css/plugins.css" rel="stylesheet">
+					<div>
+						<button @click="count++" class="button--primary">count in config: {{ count }}</button>
+					</div>
+				`,
+				computed: {
+					count: {
+						get() { return (pluginState.get() || {}).count || 0; },
+						async set(count) { await pluginState.set({ count }); }
+					}
+				}
+			}).mount(this.shadowRoot);
 		}
 	}
 }
 
-class PluginMemberMapGrid extends HTMLElement {
-	static get observedAttributes() { return ['member-ids']; }
+class PluginTestAccountingNavigation extends HTMLElement {
+	static get observedAttributes() { return ['period-id']; }
 
 	constructor() {
 		super();
 		this.attachShadow({ mode: 'open' });
-		this.shadowRoot.innerHTML = `
-			<link href="/css/plugins.css" rel="stylesheet">
-			<style>.map-el { width: 100%; height: calc( 100vh - 180px ) }</style>
-			<div class="map-el">Google Maps Laden ...</div>
-		`;
+	}
+
+	connectedCallback() {
+		if (this.isConnected) {
+			const app = createApp({
+				template: `
+					<link href="/css/plugins.css" rel="stylesheet">
+					<div>
+						<div>In Periode <em>{{periodLabel}}</em></div>
+						<button @click="count++" class="button--primary">count in config: {{ count }}</button>
+					</div>
+				`,
+				data: () => ({
+					periodId: this.getAttribute('period-id'),
+					periodLabel: ''
+				}),
+				computed: {
+					count: {
+						get() { return (pluginState.get() || {}).count || 0; },
+						async set(count) { await pluginState.set({ count }); }
+					}
+				},
+				watch: {
+					periodId: {
+						async handler() {
+							if (this.periodId.length > 0 && this.periodId !== '0') {
+								const period = await weblingInstances.period.load(parseInt(this.periodId));
+								this.periodLabel = period.label;
+							}
+						},
+						immediate: true
+					},
+				}
+			}).mount(this.shadowRoot);
+			this.setPeriodId = periodId => {
+				app.periodId = periodId;
+			}
+		}
 	}
 
 	async attributeChangedCallback() {
-		const memberIds = this.getAttribute('member-ids')
-			.split(',')
-			.map(strId => parseInt(strId, 10))
-			.filter(id => !isNaN(id) && id !== 0)
-		;
-		const instances = await Promise.all(memberIds.map(memberId => weblingInstances.member.load(memberId)));
-		await showGoogleMaps(this.shadowRoot, instances);
+		if (typeof this.setPeriodId === 'function') {
+			this.setPeriodId(this.getAttribute('period-id'))
+		}
 	}
-}
-
-async function showGoogleMaps(shadowRoot, instances) {
-	const loader = new Loader({ apiKey: pluginConfig.get().googleMapsKey });
-	await loader.load();
-
-	const map = new google.maps.Map(shadowRoot.querySelector('.map-el'));
-	const bounds = new google.maps.LatLngBounds();
-	const info = new google.maps.InfoWindow();
-
-	const memberDialogBaseURI = `${window.location.href}${window.location.href.includes('#') ? '' : '#'}/:member/view/`;
-
-	instances
-		.filter(instance => typeof instance.meta.lat === 'number' && typeof instance.meta.lng === 'number')
-		.forEach(instance => {
-			const marker = new google.maps.Marker({
-				position: new google.maps.LatLng(instance.meta.lat, instance.meta.lng),
-				map: map
-			});
-			bounds.extend(marker.position);
-			google.maps.event.addListener(marker, 'click', () => {
-				info.setContent(`<a href="${memberDialogBaseURI}${instance.id}">${instance.label}</a>`);
-				info.open(map, marker);
-			});
-		});
-
-	map.fitBounds(bounds);
 }
 
 export default {
@@ -116,88 +132,27 @@ export default {
 	pluginversion: '1.0.0',
 	hooks: [{
 		hook: 'plugin-config',
-		tagName: 'plugin-member-map-config',
+		tagName: 'plugin-test-config',
 		dialogTitle: 'Mitglieder auf einer Karte anzeigen Plugin',
+	}, {
+		hook: 'member-panel-navigation',
+		label: 'Test Plugin',
+		tagName: 'plugin-test-navigation'
+	}, {
+		hook: 'accounting-panel-navigation',
+		label: 'Test Plugin',
+		tagName: 'plugin-test-accounting-navigation'
+	}, {
+		hook: 'document-panel-navigation',
+		label: 'Test Plugin',
+		tagName: 'plugin-test-navigation'
 	}],
 	async onLoad(context) {
 		weblingInstances = context.instances;
 		pluginConfig = context.config;
-		customElements.define('plugin-member-map-config', PluginMemberMapConfig);
-		customElements.define('plugin-member-map-panel', PluginMemberMapPanel);
-		customElements.define('plugin-member-map-grid', PluginMemberMapGrid);
+		pluginState = context.state;
+		customElements.define('plugin-test-config', PluginTestConfig);
+		customElements.define('plugin-test-navigation', PluginTestNavigation);
+		customElements.define('plugin-test-accounting-navigation', PluginTestAccountingNavigation);
 	}
 }
-
-
-<template>
-  <h1>{{ msg }}</h1>
-
-  <p>
-    Recommended IDE setup:
-    <a href="https://code.visualstudio.com/" target="_blank">VSCode</a>
-    +
-    <a
-      href="https://marketplace.visualstudio.com/items?itemName=octref.vetur"
-      target="_blank"
-    >
-      Vetur
-    </a>
-    or
-    <a href="https://github.com/johnsoncodehk/volar" target="_blank">Volar</a>
-    (if using
-    <code>&lt;script setup&gt;</code>)
-  </p>
-
-  <p>See <code>README.md</code> for more information.</p>
-
-  <p>
-    <a href="https://vitejs.dev/guide/features.html" target="_blank">
-      Vite Docs
-    </a>
-    |
-    <a href="https://v3.vuejs.org/" target="_blank">Vue 3 Docs</a>
-  </p>
-
-  <button type="button" @click="count++">count is: {{ count }}</button>
-  <p>
-    Edit
-    <code>components/HelloWorld.vue</code> to test hot module replacement.
-  </p>
-</template>
-
-<script lang="ts">
-import { ref, defineComponent } from 'vue'
-export default defineComponent({
-  name: 'HelloWorld',
-  props: {
-    msg: {
-      type: String,
-      required: true
-    }
-  },
-  setup: () => {
-    const count = ref(0)
-    return { count }
-  }
-})
-</script>
-
-<style scoped>
-a {
-  color: #ff0000;
-  font-weight: bold;
-}
-
-label {
-  margin: 0 0.5em;
-  font-weight: bold;
-}
-
-code {
-  background-color: #eee;
-  padding: 2px 4px;
-  border-radius: 4px;
-  color: #304455;
-}
-</style>
-
