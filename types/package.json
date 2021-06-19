@@ -5,7 +5,7 @@
   "author": "uSystems GmbH",
   "license": "MIT",
   "main": "IWeblingPlugin.js",
-  "types": "types/IWeblingPlugin.ts",
+  "types": "IWeblingPlugin.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/usystems/webling-plugins.git"
@@ -13,5 +13,5 @@
   "bugs": {
     "url": "https://github.com/usystems/webling-plugins/issues"
   },
-  "homepage": "https://github.com/usystems/webling-plugins#readme"
+  "homepage": "https://github.com/usystems/webling-plugins/types#readme"
 }

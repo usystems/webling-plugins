@@ -1,0 +1,1 @@
+# The `Member Map` example Plugin

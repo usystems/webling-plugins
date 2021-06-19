@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "echo 'Plugin entrypoint: http://localhost:4008/index.js' && browser-sync start --server --port 4008 --cors --no-open --files '*.js'"
+    "start": "browser-sync start --server --port 4008 --cors --no-open --files '*.js'"
   },
   "repository": {
     "type": "git",

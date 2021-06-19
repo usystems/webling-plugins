@@ -37,7 +37,7 @@ export default {
 	apiversion: 1,
 	pluginversion: '1.0.0',
 	hooks: [{
-		hook: 'member-panel',
+		hook: 'member-panel-navigation',
 		label: 'Hello World',
 		tagName: 'plugin-hello-world'
 	}],
