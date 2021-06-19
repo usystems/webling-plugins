@@ -1,6 +1,6 @@
 {
   "name": "webling-plugin-types",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Interfaces for Webling Plugins",
   "author": "uSystems GmbH",
   "license": "MIT",
