@@ -6,17 +6,57 @@
 import type IWeblingPluginInstanceData from './IWeblingPluginInstanceData';
 import type IWeblingPluginInstanceUpdate from './IWeblingPluginInstanceUpdate';
 
+export interface IWeblingPluginInstance {
+	create(instance: IWeblingPluginInstanceUpdate): Promise<number>;
+	load(id: number): Promise<IWeblingPluginInstanceData>;
+	update(id: number, update: IWeblingPluginInstanceUpdate): Promise<void>;
+	delete(id: number): Promise<void>;
+	watch(id: number, watcher: () => void): () => void;
+	watchAll(watcher: () => void): () => void;
+	list(options?: { filter?: string; order?: string[] }): Promise<IWeblingPluginInstanceData[]>;
+	listIds(options?: { filter?: string; order?: string[] }): Promise<number[]>;
+}
+
 export interface IWeblingPluginInstances {
-	[instanceType: string]: {
-		create(member: IWeblingPluginInstanceUpdate): Promise<number>;
-		load(id: number): Promise<IWeblingPluginInstanceData>;
-		update(id: number, update: IWeblingPluginInstanceUpdate): Promise<void>;
-		delete(id: number): Promise<void>;
-		watch(id: number, watcher: () => void): () => void;
-		watchAll(watcher: () => void): () => void;
-		list(options?: { filter?: string; order?: string[] }): Promise<IWeblingPluginInstanceData[]>;
-		listIds(options?: { filter?: string; order?: string[] }): Promise<number[]>;
-	};
+	account: IWeblingPluginInstance;
+	accountgroup: IWeblingPluginInstance;
+	accountgrouptemplate: IWeblingPluginInstance;
+	accounttemplate: IWeblingPluginInstance;
+	apikey: IWeblingPluginInstance;
+	article: IWeblingPluginInstance;
+	articlegroup: IWeblingPluginInstance;
+	attendance: IWeblingPluginInstance;
+	comment: IWeblingPluginInstance;
+	costcenter: IWeblingPluginInstance;
+	debitor: IWeblingPluginInstance;
+	debitorcategory: IWeblingPluginInstance;
+	document: IWeblingPluginInstance;
+	documentgroup: IWeblingPluginInstance;
+	domain: IWeblingPluginInstance;
+	email: IWeblingPluginInstance;
+	emailattachment: IWeblingPluginInstance;
+	emailimage: IWeblingPluginInstance;
+	entry: IWeblingPluginInstance;
+	entrygroup: IWeblingPluginInstance;
+	event: IWeblingPluginInstance;
+	letter: IWeblingPluginInstance;
+	letterimage: IWeblingPluginInstance;
+	letterpdf: IWeblingPluginInstance;
+	member: IWeblingPluginInstance;
+	memberform: IWeblingPluginInstance;
+	membergroup: IWeblingPluginInstance;
+	payment: IWeblingPluginInstance;
+	period: IWeblingPluginInstance;
+	periodchain: IWeblingPluginInstance;
+	periodgroup: IWeblingPluginInstance;
+	rnwform: IWeblingPluginInstance;
+	rnwmerchant: IWeblingPluginInstance;
+	sms: IWeblingPluginInstance;
+	template: IWeblingPluginInstance;
+	user: IWeblingPluginInstance;
+	usergroup: IWeblingPluginInstance;
+	// fallback to stay compatible with instance types introduces in the future
+	[instanceType: string]: IWeblingPluginInstance;
 }
 
 export interface IWeblingPluginHttp {
