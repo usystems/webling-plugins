@@ -1,6 +1,6 @@
 {
   "name": "webling-plugin-types",
-  "version": "1.0.1",
+  "version": "1.0.9",
   "description": "Interfaces for Webling Plugins",
   "author": "uSystems GmbH",
   "license": "MIT",
@@ -13,5 +13,5 @@
   "bugs": {
     "url": "https://github.com/usystems/webling-plugins/issues"
   },
-  "homepage": "https://github.com/usystems/webling-plugins/types#readme"
+  "homepage": "https://github.com/usystems/webling-plugins/tree/main/types#readme"
 }
