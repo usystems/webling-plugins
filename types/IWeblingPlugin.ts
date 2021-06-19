@@ -3,22 +3,51 @@
  * @copyright uSystems GmbH, www.usystems.ch
  */
 
-import type IWeblingPluginContext from './IWeblingPluginContext';
+import type IWeblingPluginInstanceData from './IWeblingPluginInstanceData';
+import type IWeblingPluginInstanceUpdate from './IWeblingPluginInstanceUpdate';
+
+export interface IWeblingPluginInstances {
+	[instanceType: string]: {
+		create(member: IWeblingPluginInstanceUpdate): Promise<number>;
+		load(id: number): Promise<IWeblingPluginInstanceData>;
+		update(id: number, update: IWeblingPluginInstanceUpdate): Promise<void>;
+		delete(id: number): Promise<void>;
+		watch(id: number, watcher: () => void): () => void;
+		watchAll(watcher: () => void): () => void;
+		list(options?: { filter?: string; order?: string[] }): Promise<IWeblingPluginInstanceData[]>;
+		listIds(options?: { filter?: string; order?: string[] }): Promise<number[]>;
+	};
+}
+
+export interface IWeblingPluginHttp {
+	get<Result = any>(url: string): Promise<Result>;
+	post<Result = any>(url: string, data?: any): Promise<Result>;
+	put<Result = any>(url: string, data?: any): Promise<Result>;
+	delete<Result = any>(url: string): Promise<Result>;
+}
+
+export interface IWeblingPluginConfig {
+	get(): { [key: string]: any };
+	set(config: { [key: string]: any }): Promise<void>;
+}
+
+export interface IWeblingPluginState {
+	get(): any;
+	set(state: any): Promise<void>;
+}
+
+export interface IWeblingPluginContext {
+	instances: IWeblingPluginInstances;
+	http: IWeblingPluginHttp;
+	config: IWeblingPluginConfig;
+	state: IWeblingPluginState;
+	language: 'de' | 'en' | 'fr';
+}
 
 export default interface IWeblingPlugin {
-
-	/**
-	 * The name of the plugin. This is used to identify the plugin
-	 */
 	name: string;
-
 	apiversion: 1;
-
 	pluginversion: string;
-
-	/**
-	 * Hooks, where the plugin should be displayed
-	 */
 	hooks: ({
 		hook: 'member-panel-navigation' | 'accounting-panel-navigation' | 'document-panel-navigation';
 		label: string;
@@ -33,9 +62,5 @@ export default interface IWeblingPlugin {
 		dialogTitle?: string;
 		dialogWidth?: number;
 	})[];
-
-	/**
-	 * function to install the plugin
-	 */
 	onLoad(context: IWeblingPluginContext): void | Promise<void>;
 }
