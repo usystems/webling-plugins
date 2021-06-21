@@ -8,6 +8,16 @@ Webling is extensible by plugins. This repo contains all resources around the de
 The Webling plugin system is not publicly available yet. If you are interested in writing a plugin, contact us at 
 [support@webling.ch](mailto:support@webling.ch?subject=[GitHub]%20Plugin%20Access)
 
+## Table of Contents
+1. [How does a Webling plugin work](#how-does-a-webling-plugin-work)
+1. [Hello World Example](#hello-world-example)
+1. [Hooks (Extension Points)](#hooks-extension-points)
+1. [The Plugin Context](#the-plugin-context)
+1. [Plugin Development](#plugin-development)
+1. [Plugin Hosting](#plugin-hosting)
+1. [How to install and manage your Webling Plugins](#how-to-install-and-manage-your-webling-plugins)
+1. [Example Plugins](#example-plugins)
+
 ## How does a Webling plugin work
 
 Webling provides many extension points called [hooks](#hooks-extension-points) for extension. On a high level description, a 
