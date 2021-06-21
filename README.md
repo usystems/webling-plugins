@@ -11,6 +11,8 @@ The Webling plugin system is not publicly available yet. If you are interested i
 ## Table of Contents
 1. [How does a Webling plugin work](#how-does-a-webling-plugin-work)
 1. [Hello World Example](#hello-world-example)
+1. [The Plugin configuration](#the-plugin-configuration)
+1. [The Custom Elements](#the-custom-elements)
 1. [Hooks (Extension Points)](#hooks-extension-points)
 1. [The Plugin Context](#the-plugin-context)
 1. [Plugin Development](#plugin-development)
@@ -59,7 +61,7 @@ export default {
 
 A Webling plugin consists of two parts: the _configuration_ and the _custom elements_:
 
-### The Plugin configuration
+## The Plugin configuration
 
 The plugin must be a valid ES Module. The plugin configuration is an object exported as default and must implement the 
 [`IWeblingPlugin`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L87) interface. It must 
@@ -93,7 +95,7 @@ contain the following keys:
     
     The `onLoad` function can return a Promise if it needs to execute asynchronous actions.
 
-### The Custom Elements 
+## The Custom Elements 
 
 Plugins can extend webling by registering native [custom elements](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements). 
 All custom elements provided by a plugin must start with `plugin-` to be recognised as native custom elements. To avoid 
