@@ -5,7 +5,7 @@ it is a sports club, umbrella organization or a non-profit association, the soft
 
 Webling is extensible by plugins. This repo contains all resources around the development of Webling plugins.
 
-The Webling plugin system is not publically available yet. If you are interested in writing a plugin, contact us at 
+The Webling plugin system is not publicly available yet. If you are interested in writing a plugin, contact us at 
 [support@webling.ch](mailto:support@webling.ch?subject=[GitHub]%20Plugin%20Access)
 
 ## How does a Webling plugin work
@@ -21,7 +21,7 @@ Svelte or whatever you like.
 
 ## How is a Webling plugin structured
 
-Every programming tutorial must have a hello world example. Lets look at the hello world Webling plugin:
+Every programming tutorial must have a hello world example. Let's look at the hello world Webling plugin:
 
 ```Javascript
 class PluginHelloWorld extends HTMLElement {
@@ -47,11 +47,11 @@ export default {
 }
 ```
 
-A Weblig plugin consists of two parts: the _configuration_ and the _custom elements_:
+A Webling plugin consists of two parts: the _configuration_ and the _custom elements_:
 
 ### The Plugin configuration
 
-The plugin must be a valid ES Module. The plugin configuration is exported as the default export and must implement the 
+The plugin must be a valid ES Module. The plugin configuration is an object exported as default and must implement the 
 [`IWeblingPlugin`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L87) interface. It must 
 contain the following keys:
 
@@ -76,8 +76,8 @@ contain the following keys:
 
 - `onLoad`: Function
 
-    After Webling is loaded, all plugins are dynamically imported and the `onLoad` of each plugin is called. The `onLoad`
-    function gets the plugin context as an argument. The context is described in [Starting a Plugin](#the-plugin-context).
+    After Webling is loaded, all plugins are dynamically imported and the `onLoad` function of each plugin is called. The `onLoad`
+    function gets the plugin context as an argument. The context is described in [The Plugin Context](#the-plugin-context).
     
     The `onLoad` callback should register all custom elements provided in the hooks.
     
@@ -94,12 +94,37 @@ naming conflicts the custom elements of a plugin should be unique and contain th
 To provide Webling with the necessary information to load the plugin, every extension point has a configuration with the name of the 
 extension point (called hook) and all needed context information. 
 
-Some extension points provide event listeners. For example, the `plugin-config` hook provides an event listener to 
-close the configuration dialog. These listeners are called using native events:
+Some extension points provide event listeners. For example, the `plugin-config` or the `member-grid-menu` hook provides an event listener to 
+close the dialog. These listeners are called using native events:
 
 ```javascript
 this.shadowRoot.dispatchEvent(new CustomEvent('close-dialog', { bubbles: true, composed: true }));
 ```
+
+Note, that the the second parameter must contain `bubbles: true` to bubble up the dom tree and [`composed: true`](https://developer.mozilla.org/en-US/docs/Web/API/Event/composed) 
+to allow the custom event to trigger listeners outside of the shadow dom.
+
+Some extention points receive context information by custom attributes like the id of the member which is displayed
+in the `member-dialog-sidbar` or the id of the active period in the `accounting-panel-navigation`. All attributes are 
+reactive, which means if the underlying property changes, the attributes is updated:
+
+```javascript
+class PluginMemberDialogSidebar extends HTMLElement {
+	static get observedAttributes() { return ['member-id']; }
+	constructor() {
+		super();
+		this.attachShadow({ mode: 'open' });
+	}
+
+	async connectedCallback() {
+		this.shadowRoot.innerHTML = `<div>Member id: ${this.getAttribute('member-id')}</div>`;
+	}
+
+	async attributeChangedCallback(name, oldValue, newValue) {
+		this.shadowRoot.innerHTML = `<div>Member id: ${newValue}</div>`;
+	}
+}
+``` 
 
 Webling provides the following hooks for extension:
 
@@ -124,13 +149,13 @@ This hook allows the plugin to provide a configuration dialog. An example of a c
 ### `member-panel-navigation`
 
 If you want to extend the member panel with a new page, this hook gives you the possibility to add a navigation
-item to the member panel.
+item to the member panel and display a custom view.
 
 #### Options
 
 ```Javascript
 {
-  hook: 'member-panel', // the name of the hook, here 'member-panel'.
+  hook: 'member-panel-navigation', // where do we want to hook into webling?
   label: 'My Plugin Page', // the label of the menu item, which is shown in the member navigation. 
   tagName: 'plugin-my-custom-element' // the name of the custom element representing the new page.
 }
@@ -138,9 +163,118 @@ item to the member panel.
 
 ### `member-grid-menu`
 
+If you want to extend the member grid with a new grid action like an export, an aggregation or whatever you can imagine,
+with this hook you can extend the member grid with a custom dialog.
+
+#### Options
+
+```Javascript
+{
+  hook: 'member-grid-menu', // where do we want to hook into webling?
+  label: 'My Plugin Gird Export', // the label of the grid menu item, which is shown in the member grid. 
+  tagName: 'plugin-my-custom-element', // the name of the custom element representing the new page.
+  dialogTitle: 'My Plugin Export dialog', // optional title for the dialog. If no title is provided, the label is displayd
+  dialogWidth: 800 // optional with of the dialog in pixels. If no width is provided, the dialog has a with of 900 pixels. 
+}
+```
+
+#### Attributes
+
+The custom element is provided with two attributes containing the grid selection and the membergroup which is displayed:
+
+- The `member-ids` attribute contains the ids of all selected members in the grid. If no members are selected, the 
+  `member-ids` attribute contains the ids of all members in the grid.
+- The `membergroup-id` attribute contains the id if the membergroup which is displayed in the grid. This attribute is only
+  available if a membergroup is displayed. If a search is executed, a saved search is shown or all members are displayed
+  this attribute is empty.
+
+```Javascript
+class PluginMyCustomElement extends HTMLElement {
+	constructor() {
+		super();
+		this.attachShadow({ mode: 'open' });
+		this.shadowRoot.innerHTML = `
+		    <div>MemberIds: ${this.getAttribute('member-ids')}</div>
+		    <div>Displayed Membergroup: ${this.getAttribute('membergroup-id')}</div>
+	    `;
+	}
+}
+```
+
+### `member-dialog-sidbar`
+
+This hook allows the plugin to add information in the member dialog. An example of how to add the last modified time to 
+the member dialog can be found in the [member lastmodified example plugin](./examples/member-lastmodified#readme)
+
+#### Options
+
+```Javascript
+{
+  hook: 'member-dialog-sidbar', // where do we want to hook into webling?
+  tagName: 'plugin-my-plugin-configuration' // the name of the custom element we want want to display in the member dialog
+}
+```
+
+#### Attributes
+
+The custom element is provided with an attribute `member-id` containing the id of the member which is displayed.
+
+```Javascript
+class PluginMyCustomElement extends HTMLElement {
+	constructor() {
+		super();
+		this.attachShadow({ mode: 'open' });
+		this.shadowRoot.innerHTML = `
+		    <div>Displayed id: ${this.getAttribute('member-id')}</div>
+	    `;
+	}
+}
+```
+
 ### `accounting-panel-navigation`
 
+If you want to extend the accounting panel with a new page, this hook gives you the possibility to add a navigation
+item to the accounting panel and display a custom view.
+
+#### Options
+
+```Javascript
+{
+  hook: 'accounting-panel-navigation', // where do we want to hook into webling?
+  label: 'My Plugin Page', // the label of the menu item, which is shown in the accounting navigation. 
+  tagName: 'plugin-my-custom-element' // the name of the custom element representing the new page.
+}
+```
+#### Attributes
+
+The custom element is provided with an attribute `period-id` containing the id of the active period.
+
+```Javascript
+class PluginMyCustomElement extends HTMLElement {
+	constructor() {
+		super();
+		this.attachShadow({ mode: 'open' });
+		this.shadowRoot.innerHTML = `
+		    <div>Active period: ${this.getAttribute('period-id')}</div>
+	    `;
+	}
+}
+```
+
 ### `document-panel-navigation`
+
+If you want to extend the document panel with a new page, this hook gives you the possibility to add a navigation
+item to the document panel and display a custom view.
+
+#### Options
+
+```Javascript
+{
+  hook: 'document-panel-navigation', // where do we want to hook into webling?
+  label: 'My Plugin Page', // the label of the menu item, which is shown in the member navigation. 
+  tagName: 'plugin-my-custom-element' // the name of the custom element representing the new page.
+}
+```
 
 ## The Plugin Context
 
@@ -149,43 +283,107 @@ The context implements the [`IWeblingPluginContext`](https://github.com/usystems
 interface and contains the following apis:
 
 ### `context.instances`
-[`IWeblingPluginInstances`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L20)
+`context.instances` provides access to the actual data saved in Webling like members, entries or documents. The properties 
+of the different objects and the connections between the objects are described in the [Webling API
+Documentation](https://demo.webling.ch/api/1).
+
+`context.instances` implements the [`IWeblingPluginInstances`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L20)
+interface. The interface also contains a list of the names of all object types.
+
+Each object type proides the following methods:
+
+The `create(instance: IWeblingPluginInstanceUpdate): Promise<number>` method creates a new instance.
+
+```javascript
+const newMembergroupId = await context.instances.membergroup.create({
+	properties: {
+	    'title': 'Honored Members'
+	},
+	children: {
+	    'member': [543, 463]
+	},
+	parents: [555]
+});
+```
+
+
+	load(id: number): Promise<IWeblingPluginInstanceData>;
+	update(id: number, update: IWeblingPluginInstanceUpdate): Promise<void>;
+	delete(id: number): Promise<void>;
+	watch(id: number, watcher: () => void): () => void;
+	watchAll(watcher: () => void): () => void;
+	list(options?: { filter?: string; order?: string[] }): Promise<IWeblingPluginInstanceData[]>;
+	listIds(options?: { filter?: string; order?: string[] }): Promise<number[]>;
 
 ### `context.http`
-[`IWeblingPluginHttp`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L62)
+Since the plugins are loaded from a different origin than Webling the plugin cannot send a fetch request to the webling
+backend. Through `context.http` the plugin can send http requests to the webling backend. `context.http` implements the [`IWeblingPluginHttp`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L62)
+interface.
 
-	- `get(url: string): Promise`
-	- `post(url: string, data?: any): Promise`
-	- `put(url: string, data?: any): Promise`
-	- `delete(url: string): Promise`
+The method `get(url: string): Promise` sends a get request to the Webling backend and resolves with the response.
+
+```javascript
+const monthlyStats = await context.http.get('period/2230/monthlystats');
+```
+
+The method `post(url: string, data?: any): Promise` sends a post request to the Webling backend and resolves with the response.
+
+```javascript
+const duplicateMembers = await context.http.post(
+    'statistics/duplicatemembers', 
+    { "membergroup": 555, "properties": [75] } 
+);
+```
+
+The method `put(url: string, data?: any): Promise` sends a put request to the Webling backend and resolves with the response.
+
+The method `delete(url: string): Promise` sends a delete request to the Webling backend and resolves with the response.
 
 ### `context.config`
 
-`context.config` implements [`IWeblingPluginConfig`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L69)
-and provides an interface to the plugin configuration. If the plugin needs specific data like API keys for
+`context.config` provides access to the plugin configuration. If the plugin needs specific data like API keys for
 Google Maps, or some formatting options, you should store these in the configuration object. The configuration
-must be serializable. The plugin configuration should be managed in an interface which is displayed in the `plugin-config` 
-hook.
+must be a serializable object. The plugin configuration should be managed in an interface which is displayed in the 
+`plugin-config` hook. 
 
-The plugin configuration is only writable by the administrator of the Webling, but readable for every user.
+`context.config` implements the [`IWeblingPluginConfig`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L69)
+interface 
 
-The configuration object has the following structure:
+The plugin configuration is only writable by the administrator of the Webling Account, but readable for every user.
 
-  - `get(): Object`: `context.config.get()` returns the current configuration of the plugin
-  - `set(config: Object): Promise`: updates the plugin configuration. The returned promise resolves if the 
-  configuration was saved successfully.
+The method `get(): Object` returns the current configuration object.
+
+```javascript
+const googleMapsApiKey = context.config.get().apiKey;
+```
+
+And the configuration can be updated with the `set(config: Object): Promise` method. The returned promise resolves if 
+the configuration is saved to the webling backend.
+
+```javascript
+await context.config.set({ ...currentConfig, apiKey: newGoogleMapsApiKey });
+```
 
 ### `context.state`
 
-`context.state`  implements [`IWeblingPluginState`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L74)
-and provides an interface to the plugin state. The state can be any serializable object. In contrast to the
+`context.state` provides access to the plugin state. The state can be any serializable object. In contrast to the
 configuration it can be read and written by all users.
 
-The state object has the following structure:
+`context.state` implements the [`IWeblingPluginState`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L74)
+interface 
 
-  - `get(): any`: `context.state.get()` returns the current state of the plugin.
-  - `set(state: any): Promise`: updates the plugin state. The returned promise resolves if the state was 
-  saved successfully.
+The method `get(): Object` returns the current state of the plugin.
+
+```javascript
+const note = context.state.get().note;
+```
+
+And the state can be updated with the `set(config: Object): Promise` method. The returned promise resolves if 
+the state is saved to the webling backend.
+
+```javascript
+await context.state.set({ ...state, note: newNote });
+```
 
 ### `context.language`
 
@@ -194,6 +392,10 @@ The language, the Webling user is using. The following languages are possible:
 - `de`(German) This is the default language of the vast majority of users.
 - `en`(English)
 - `fr`(French)
+
+```javascript
+const currentLanguage = context.language;
+```
 
 ## Plugin Development
 
@@ -214,7 +416,6 @@ If you write a plugin in typescript you can install the webling typings with
 
 `npm install webling-plugin-typings`
 
-
 ## Plugin Hosting
 
 Since a Plugin must be publicly available, we recommend hosting Webling plugins on GitHub. Since GitHub is not a content
@@ -226,3 +427,7 @@ A more detailed explanation on how to deliver your plugin correctly look at this
 ### [Member Map](./examples/member-map#readme)
 
 An example plugins which shows how to visualize all members on a Google map directly in webling itself.
+
+### [Member Lastmodified](./examples/member-lastmodified#readme)
+
+A plugin which adds the last modification time to the member dialog.
