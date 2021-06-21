@@ -19,31 +19,31 @@ Since a Webling plugin is a micro frontend using native custom element as root e
 agnostic. A Webling plugin can be build using your favorite frontend framework: plain JavaScript, React, VueJs, Angular, 
 Svelte or whatever you like. 
 
-## How is a Webling plugin structured
+## Hello World Example
 
 Every programming tutorial must have a hello world example. Let's look at the hello world Webling plugin:
 
 ```Javascript
 class PluginHelloWorld extends HTMLElement {
-	constructor() {
-		super();
-		this.attachShadow({ mode: 'open' });
-		this.shadowRoot.innerHTML = '<div>Hello World</div>';
-	}
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = '<div>Hello World</div>';
+    }
 }
 
 export default {
-	name: 'com.webling.plugin.hello-world',
-	apiversion: 1,
-	pluginversion: '1.0.0',
-	hooks: [{
-		hook: 'member-panel-navigation',
-		label: 'Hello World',
-		tagName: 'plugin-hello-world'
-	}],
-	onLoad(context) {
-		customElements.define('plugin-hello-world', PluginHelloWorld);
-	}
+    name: 'com.webling.plugin.hello-world',
+    apiversion: 1,
+    pluginversion: '1.0.0',
+    hooks: [{
+        hook: 'member-panel-navigation',
+        label: 'Hello World',
+        tagName: 'plugin-hello-world'
+    }],
+    onLoad(context) {
+        customElements.define('plugin-hello-world', PluginHelloWorld);
+    }
 }
 ```
 
@@ -89,46 +89,70 @@ Plugins can extend webling by registering native [custom elements](https://devel
 All custom elements provided by a plugin must start with `plugin-` to be recognised as native custom elements. To avoid 
 naming conflicts the custom elements of a plugin should be unique and contain the plugin name.
 
-## Hooks (Extension Points)
+A Plugin shoud be an encasulated web component. [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM)
+is the perfect tool to encapsulate your plugin:
 
-To provide Webling with the necessary information to load the plugin, every extension point has a configuration with the name of the 
-extension point (called hook) and all needed context information. 
+```Javascript
+class PluginCustomElement extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = '<div id="content"></div>';
+    }
 
-Some extension points provide event listeners. For example, the `plugin-config` or the `member-grid-menu` hook provides an event listener to 
-close the dialog. These listeners are called using native events:
+    connectedCallback() {
+        el.shadowRoot.querySelector('#content').textContent = `Last displayed ${(new DAte()).toLocaleDateString('de-ch')}`;
+    }
+}
+```
+
+#### Events
+
+Some [hooks](#hooks-extension-points) provide event listeners. For example, the `plugin-config` or the `member-grid-menu` 
+hook provides an event listener to close the dialog. These listeners are called using native events:
 
 ```javascript
 this.shadowRoot.dispatchEvent(new CustomEvent('close-dialog', { bubbles: true, composed: true }));
 ```
 
-Note, that the the second parameter must contain `bubbles: true` to bubble up the dom tree and [`composed: true`](https://developer.mozilla.org/en-US/docs/Web/API/Event/composed) 
+Note, that the the second parameter must contain `bubbles: true` to bubble up the dom tree and [`composed: true`](https://developer.mozilla.org/en-US/docs/Web/API/Event/composed)
 to allow the custom event to trigger listeners outside of the shadow dom.
 
-Some extention points receive context information by custom attributes like the id of the member which is displayed
-in the `member-dialog-sidbar` or the id of the active period in the `accounting-panel-navigation`. All attributes are 
-reactive, which means if the underlying property changes, the attributes is updated:
+#### Attributes
+
+The custom element in some [hooks](#hooks-extension-points) receive context information by custom attributes like the id 
+of the member which is displayed in the `member-dialog-sidbar` extention point or the id of the active period in the 
+`accounting-panel-navigation` extention point. All attributes are reactive, which means if the underlying property changes, 
+the attributes is updated:
 
 ```javascript
 class PluginMemberDialogSidebar extends HTMLElement {
-	static get observedAttributes() { return ['member-id']; }
-	constructor() {
-		super();
-		this.attachShadow({ mode: 'open' });
-	}
+    static get observedAttributes() { return ['member-id']; }
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+    }
 
-	async connectedCallback() {
-		this.shadowRoot.innerHTML = `<div>Member id: ${this.getAttribute('member-id')}</div>`;
-	}
+    connectedCallback() {
+        this.shadowRoot.innerHTML = `<div>Member id: ${this.getAttribute('member-id')}</div>`;
+    }
 
-	async attributeChangedCallback(name, oldValue, newValue) {
-		this.shadowRoot.innerHTML = `<div>Member id: ${newValue}</div>`;
-	}
+    attributeChangedCallback(name, oldValue, newValue) {
+        this.shadowRoot.innerHTML = `<div>Member id: ${newValue}</div>`;
+    }
 }
 ``` 
 
+## Hooks (Extension Points)
+
+To provide Webling with the necessary information to load the plugin, every extension point has a configuration with the name of the
+extension point (called hook) and all needed context information.
+
 Webling provides the following hooks for extension:
 
-### `plugin-config`
+### The Plugin configuration Dialog
+
+Hook Name: `plugin-config`
 
 This hook allows the plugin to provide a configuration dialog. An example of a configuration dialog can be found here:
 [member map example plugin](./examples/member-map#readme)
@@ -137,8 +161,8 @@ This hook allows the plugin to provide a configuration dialog. An example of a c
 
 ```Javascript
 {
-  hook: 'plugin-config', // the name of the hook, here 'plugin-config'.
-  tagName: 'plugin-my-plugin-configuration' // the name of the custom element representing the configuration interface
+    hook: 'plugin-config',
+    tagName: 'plugin-my-plugin-configuration' // the name of the custom element representing the configuration interface
 }
 ```
 
@@ -146,7 +170,9 @@ This hook allows the plugin to provide a configuration dialog. An example of a c
 
 - `close-dialog`: close the config dialog
 
-### `member-panel-navigation`
+### Add a Page to the Member Panel
+
+Hook Name: `member-panel-navigation`
 
 If you want to extend the member panel with a new page, this hook gives you the possibility to add a navigation
 item to the member panel and display a custom view.
@@ -155,13 +181,15 @@ item to the member panel and display a custom view.
 
 ```Javascript
 {
-  hook: 'member-panel-navigation', // where do we want to hook into webling?
-  label: 'My Plugin Page', // the label of the menu item, which is shown in the member navigation. 
-  tagName: 'plugin-my-custom-element' // the name of the custom element representing the new page.
+    hook: 'member-panel-navigation',
+    label: 'My Plugin Page', // the label of the menu item, which is shown in the member navigation. 
+    tagName: 'plugin-my-custom-element' // the name of the custom element representing the new page.
 }
 ```
 
-### `member-grid-menu`
+### Extend the Member Grid Actions
+
+Hook Name:  `member-grid-menu`
 
 If you want to extend the member grid with a new grid action like an export, an aggregation or whatever you can imagine,
 with this hook you can extend the member grid with a custom dialog.
@@ -170,11 +198,11 @@ with this hook you can extend the member grid with a custom dialog.
 
 ```Javascript
 {
-  hook: 'member-grid-menu', // where do we want to hook into webling?
-  label: 'My Plugin Gird Export', // the label of the grid menu item, which is shown in the member grid. 
-  tagName: 'plugin-my-custom-element', // the name of the custom element representing the new page.
-  dialogTitle: 'My Plugin Export dialog', // optional title for the dialog. If no title is provided, the label is displayd
-  dialogWidth: 800 // optional with of the dialog in pixels. If no width is provided, the dialog has a with of 900 pixels. 
+    hook: 'member-grid-menu',
+    label: 'My Plugin Gird Export', // the label of the grid menu item, which is shown in the member grid. 
+    tagName: 'plugin-my-custom-element', // the name of the custom element representing the new page.
+    dialogTitle: 'My Plugin Export dialog', // optional title for the dialog. If no title is provided, the label is displayd
+    dialogWidth: 800 // optional with of the dialog in pixels. If no width is provided, the dialog has a with of 900 pixels. 
 }
 ```
 
@@ -190,18 +218,20 @@ The custom element is provided with two attributes containing the grid selection
 
 ```Javascript
 class PluginMyCustomElement extends HTMLElement {
-	constructor() {
-		super();
-		this.attachShadow({ mode: 'open' });
-		this.shadowRoot.innerHTML = `
-		    <div>MemberIds: ${this.getAttribute('member-ids')}</div>
-		    <div>Displayed Membergroup: ${this.getAttribute('membergroup-id')}</div>
-	    `;
-	}
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+            <div>MemberIds: ${this.getAttribute('member-ids')}</div>
+            <div>Displayed Membergroup: ${this.getAttribute('membergroup-id')}</div>
+        `;
+    }
 }
 ```
 
-### `member-dialog-sidbar`
+### Extend the Member Dialog Sidebar
+
+Hook Name: `member-dialog-sidbar`
 
 This hook allows the plugin to add information in the member dialog. An example of how to add the last modified time to 
 the member dialog can be found in the [member lastmodified example plugin](./examples/member-lastmodified#readme)
@@ -210,8 +240,8 @@ the member dialog can be found in the [member lastmodified example plugin](./exa
 
 ```Javascript
 {
-  hook: 'member-dialog-sidbar', // where do we want to hook into webling?
-  tagName: 'plugin-my-plugin-configuration' // the name of the custom element we want want to display in the member dialog
+    hook: 'member-dialog-sidbar',
+    tagName: 'plugin-my-plugin-configuration' // the name of the custom element we want want to display in the member dialog
 }
 ```
 
@@ -221,17 +251,19 @@ The custom element is provided with an attribute `member-id` containing the id o
 
 ```Javascript
 class PluginMyCustomElement extends HTMLElement {
-	constructor() {
-		super();
-		this.attachShadow({ mode: 'open' });
-		this.shadowRoot.innerHTML = `
-		    <div>Displayed id: ${this.getAttribute('member-id')}</div>
-	    `;
-	}
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+            <div>Displayed id: ${this.getAttribute('member-id')}</div>
+        `;
+    }
 }
 ```
 
-### `accounting-panel-navigation`
+### Add a Page to the Accounting Panel
+
+Hook Name: `accounting-panel-navigation`
 
 If you want to extend the accounting panel with a new page, this hook gives you the possibility to add a navigation
 item to the accounting panel and display a custom view.
@@ -240,9 +272,9 @@ item to the accounting panel and display a custom view.
 
 ```Javascript
 {
-  hook: 'accounting-panel-navigation', // where do we want to hook into webling?
-  label: 'My Plugin Page', // the label of the menu item, which is shown in the accounting navigation. 
-  tagName: 'plugin-my-custom-element' // the name of the custom element representing the new page.
+    hook: 'accounting-panel-navigation',
+    label: 'My Plugin Page', // the label of the menu item, which is shown in the accounting navigation. 
+    tagName: 'plugin-my-custom-element' // the name of the custom element representing the new page.
 }
 ```
 #### Attributes
@@ -251,17 +283,19 @@ The custom element is provided with an attribute `period-id` containing the id o
 
 ```Javascript
 class PluginMyCustomElement extends HTMLElement {
-	constructor() {
-		super();
-		this.attachShadow({ mode: 'open' });
-		this.shadowRoot.innerHTML = `
-		    <div>Active period: ${this.getAttribute('period-id')}</div>
-	    `;
-	}
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+            <div>Active period: ${this.getAttribute('period-id')}</div>
+        `;
+    }
 }
 ```
 
-### `document-panel-navigation`
+### Add a Page to the Document Panel
+
+Hook Name `document-panel-navigation`
 
 If you want to extend the document panel with a new page, this hook gives you the possibility to add a navigation
 item to the document panel and display a custom view.
@@ -270,9 +304,9 @@ item to the document panel and display a custom view.
 
 ```Javascript
 {
-  hook: 'document-panel-navigation', // where do we want to hook into webling?
-  label: 'My Plugin Page', // the label of the menu item, which is shown in the member navigation. 
-  tagName: 'plugin-my-custom-element' // the name of the custom element representing the new page.
+    hook: 'document-panel-navigation',
+    label: 'My Plugin Page', // the label of the menu item, which is shown in the member navigation. 
+    tagName: 'plugin-my-custom-element' // the name of the custom element representing the new page.
 }
 ```
 
@@ -296,24 +330,24 @@ The `create(instance: IWeblingPluginInstanceUpdate): Promise<number>` method cre
 
 ```javascript
 const newMembergroupId = await context.instances.membergroup.create({
-	properties: {
-	    'title': 'Honored Members'
-	},
-	children: {
-	    'member': [543, 463]
-	},
-	parents: [555]
+    properties: {
+        'title': 'Honored Members'
+    },
+    children: {
+        'member': [543, 463]
+    },
+    parents: [555]
 });
 ```
 
 
-	load(id: number): Promise<IWeblingPluginInstanceData>;
-	update(id: number, update: IWeblingPluginInstanceUpdate): Promise<void>;
-	delete(id: number): Promise<void>;
-	watch(id: number, watcher: () => void): () => void;
-	watchAll(watcher: () => void): () => void;
-	list(options?: { filter?: string; order?: string[] }): Promise<IWeblingPluginInstanceData[]>;
-	listIds(options?: { filter?: string; order?: string[] }): Promise<number[]>;
+    load(id: number): Promise<IWeblingPluginInstanceData>;
+    update(id: number, update: IWeblingPluginInstanceUpdate): Promise<void>;
+    delete(id: number): Promise<void>;
+    watch(id: number, watcher: () => void): () => void;
+    watchAll(watcher: () => void): () => void;
+    list(options?: { filter?: string; order?: string[] }): Promise<IWeblingPluginInstanceData[]>;
+    listIds(options?: { filter?: string; order?: string[] }): Promise<number[]>;
 
 ### `context.http`
 Since the plugins are loaded from a different origin than Webling the plugin cannot send a fetch request to the webling
