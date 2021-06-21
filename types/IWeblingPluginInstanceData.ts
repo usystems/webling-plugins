@@ -3,7 +3,7 @@
  * @copyright uSystems GmbH, www.usystems.ch
  */
 
-export default interface IWeblingPluginInstance {
+export default interface IWeblingPluginInstanceData {
 	readonly type: string;
 	readonly label: string;
 	readonly meta: {

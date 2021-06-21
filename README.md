@@ -318,60 +318,140 @@ interface and contains the following apis:
 
 ### `context.instances`
 `context.instances` provides access to the actual data saved in Webling like members, entries or documents. The properties 
-of the different objects and the connections between the objects are described in the [Webling API
+of the different instances and the connections between the instances are described in the [Webling API
 Documentation](https://demo.webling.ch/api/1).
 
 `context.instances` implements the [`IWeblingPluginInstances`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L20)
 interface. The interface also contains a list of the names of all object types.
 
-Each object type proides the following methods:
+Loaded instances are returned implementing the [`IWeblingPluginInstanceData`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPluginInstanceData.ts#L6)
+interface and instance updates must be of the form [`IWeblingPluginInstanceUpdate`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPluginInstanceUpdate.ts#L6).
 
-The `create(instance: IWeblingPluginInstanceUpdate): Promise<number>` method creates a new instance.
+Each instance type type proides the following methods:
 
-```javascript
-const newMembergroupId = await context.instances.membergroup.create({
-    properties: {
-        'title': 'Honored Members'
-    },
-    children: {
-        'member': [543, 463]
-    },
-    parents: [555]
-});
-```
+- The `load(id: number): Promise<IWeblingPluginInstanceData>` method loads an instance from the webling backend. 
 
+  ```javascript
+  const member = await context.instances.member.load(554);
+  const memberLabel = member.label;
+  ```
 
-    load(id: number): Promise<IWeblingPluginInstanceData>;
-    update(id: number, update: IWeblingPluginInstanceUpdate): Promise<void>;
-    delete(id: number): Promise<void>;
-    watch(id: number, watcher: () => void): () => void;
-    watchAll(watcher: () => void): () => void;
-    list(options?: { filter?: string; order?: string[] }): Promise<IWeblingPluginInstanceData[]>;
-    listIds(options?: { filter?: string; order?: string[] }): Promise<number[]>;
+- The `watch(id: number, watcher: () => void): () => void` method allowes to watch a specific instance. The watcher is 
+  triggered if the instance has changed. Changes can come from this or another plugin, the webling client itself of a 
+  change from another user. The `watch` method returns a callback to stop watching the instance.
+
+  ```javascript
+  const member = await context.instances.member.load(554);
+  let memberLabel = member.label;
+  context.instances.member.watch(554, async () => {
+      const member = await context.instances.member.load(554);
+      memberLabel = member.label;
+  });
+  ```
+
+- The `list(options?: { filter?: string; order?: string[] }): Promise<IWeblingPluginInstanceData[]>` method returns
+  a list of instances.
+  - If no options are passed, all instances of this type are loaded and returned.
+  - If a `options.filter` is passed, only the instances are returned which satisfies the filter. The query language used
+    to filter the instances is described in the [Query Language](https://demo.webling.ch/api/1#header-query-language) Section
+    of the [Webling API Documentation](https://demo.webling.ch/api/1).
+  - If a `options.order` is passed, the result is orderd accordingly. E.g. if the `options.order` array is 
+    `['Vorname DESC', 'Nachname ASC']` the result is first orderd by `Vorname` descending and instances with equal
+    `Vorname` properties are orderd `Nachname` ascending. All path expressions from the [Query Language](https://demo.webling.ch/api/1#header-query-language)
+    can be used to sort the results. 
+    
+  Get all members in the group `Junioren`, which are older than 17 and sort the result by birth year 
+  ```javascript
+  const members = await context.instances.member.list({ 
+      filter: '$parents.title = "Junioren" AND AGE(`Geburtstag`) > 17',
+      order: 'YEAR(`Geburtstag`) ASC'
+  });
+    ```    
+  
+- The `listIds(options?: { filter?: string; order?: string[] }): Promise<number[]>` method is the same as the `list` method, 
+  but it returns only the ids of the matching instances.
+
+  Get all members which have an open debitor and are in a supgroup of `Aktive`, orderd by the remaining amount of the debitor
+  ```javascript
+  const memberIds = await context.instances.member.list({ 
+      filter: '$links.debitor.state="open" AND $ancestors.$label = `Aktive`',
+      order: '$links.debitor.remainingamount DESC'
+  });
+  ```
+
+- The `watchAll(watcher: () => void): () => void` method allowes to watch the list of all instances. The watcher is 
+  triggered if an instance is created, an instance is deleted or if the order of the list has changed. Changes can come 
+  from this or another plugin, the webling client itself of a change from another user. The `watchAll` methode returns a 
+  callback to stop watching the list.
+
+  ```javascript
+  let allOpenDebitorsInPeriod = await context.instances.debitor.list({ 
+      filter: `$parent.$id = ${this.getAttribute('period-id')}` 
+  });
+  context.instances.debitor.watchAll(async () => {
+      allOpenDebitorsInPeriod = await context.instances.debitor.list({ 
+          filter: `$parent.$id = ${this.getAttribute('period-id')}` 
+      });
+  });
+  ```
+
+- The `create(instance: IWeblingPluginInstanceUpdate): Promise<number>` method creates a new instance.
+
+  ```javascript
+  const newMembergroupId = await context.instances.membergroup.create({
+      properties: {
+          title: 'Honored Members'
+      },
+      children: {
+          member: [543, 463]
+      },
+      parents: [555]
+  });
+  ```
+    
+- The `update(id: number, update: IWeblingPluginInstanceUpdate): Promise<void>` method updates the properties, links,
+  children or parents of an instance.
+
+  ```javascript
+  await context.instances.member.update(295, {
+      properties: {
+          Funktion: 'Aktuar'
+      }
+  });
+  ```
+
+- The `delete(id: number): Promise<void>` method deletes an instance.
+
+  ```javascript
+  const unusedDocuments = await context.instances.document.listIds({ 
+      filter: `$parent.$label = "Ungebraucht"` 
+  });
+  await Promise.all(unusedDocuments.map(async documentId => context.instances.document.delete(documentId)));
+  ```
 
 ### `context.http`
 Since the plugins are loaded from a different origin than Webling the plugin cannot send a fetch request to the webling
 backend. Through `context.http` the plugin can send http requests to the webling backend. `context.http` implements the [`IWeblingPluginHttp`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L62)
 interface.
 
-The method `get(url: string): Promise` sends a get request to the Webling backend and resolves with the response.
+- The method `get(url: string): Promise` sends a get request to the Webling backend and resolves with the response.
 
-```javascript
-const monthlyStats = await context.http.get('period/2230/monthlystats');
-```
+  ```javascript
+  const monthlyStats = await context.http.get('period/2230/monthlystats');
+  ```
 
-The method `post(url: string, data?: any): Promise` sends a post request to the Webling backend and resolves with the response.
+- The method `post(url: string, data?: any): Promise` sends a post request to the Webling backend and resolves with the response.
 
-```javascript
-const duplicateMembers = await context.http.post(
-    'statistics/duplicatemembers', 
-    { "membergroup": 555, "properties": [75] } 
-);
-```
+  ```javascript
+  const duplicateMembers = await context.http.post(
+      'statistics/duplicatemembers', 
+      { "membergroup": 555, "properties": [75] } 
+  );
+  ```
 
-The method `put(url: string, data?: any): Promise` sends a put request to the Webling backend and resolves with the response.
+- The method `put(url: string, data?: any): Promise` sends a put request to the Webling backend and resolves with the response.
 
-The method `delete(url: string): Promise` sends a delete request to the Webling backend and resolves with the response.
+- The method `delete(url: string): Promise` sends a delete request to the Webling backend and resolves with the response.
 
 ### `context.config`
 
@@ -385,18 +465,18 @@ interface
 
 The plugin configuration is only writable by the administrator of the Webling Account, but readable for every user.
 
-The method `get(): Object` returns the current configuration object.
+- The method `get(): Object` returns the current configuration object.
 
-```javascript
-const googleMapsApiKey = context.config.get().apiKey;
-```
+  ```javascript
+  const googleMapsApiKey = context.config.get().apiKey;
+  ```
 
-And the configuration can be updated with the `set(config: Object): Promise` method. The returned promise resolves if 
-the configuration is saved to the webling backend.
+- And the configuration can be updated with the `set(config: Object): Promise` method. The returned promise resolves if 
+  the configuration is saved to the webling backend.
 
-```javascript
-await context.config.set({ ...currentConfig, apiKey: newGoogleMapsApiKey });
-```
+  ```javascript
+  await context.config.set({ ...currentConfig, apiKey: newGoogleMapsApiKey });
+  ```
 
 ### `context.state`
 
@@ -406,18 +486,18 @@ configuration it can be read and written by all users.
 `context.state` implements the [`IWeblingPluginState`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L74)
 interface 
 
-The method `get(): Object` returns the current state of the plugin.
+- The method `get(): Object` returns the current state of the plugin.
 
-```javascript
-const note = context.state.get().note;
-```
+  ```javascript
+  const note = context.state.get().note;
+  ```
 
-And the state can be updated with the `set(config: Object): Promise` method. The returned promise resolves if 
-the state is saved to the webling backend.
+- And the state can be updated with the `set(config: Object): Promise` method. The returned promise resolves if 
+  the state is saved to the webling backend.
 
-```javascript
-await context.state.set({ ...state, note: newNote });
-```
+  ```javascript
+  await context.state.set({ ...state, note: newNote });
+  ```
 
 ### `context.language`
 
@@ -455,6 +535,10 @@ If you write a plugin in typescript you can install the webling typings with
 Since a Plugin must be publicly available, we recommend hosting Webling plugins on GitHub. Since GitHub is not a content
 delivery network, you need a cdn to deliver your plugin with the correct headers. You can use [raw.githack.com](https://raw.githack.com/).
 A more detailed explanation on how to deliver your plugin correctly look at this [medium post](https://lukasgamper.medium.com/how-to-import-files-directly-from-github-1a41c72a3ad3).
+
+## How to install and manage your Webling Plugins
+
+A Webling plugin can be installed in the Webling Administration under `Administration` » `Integrationen` » `Plugins`.
 
 ## Example Plugins
 
