@@ -101,7 +101,7 @@ Plugins can extend webling by registering native [custom elements](https://devel
 All custom elements provided by a plugin must start with `plugin-` to be recognised as native custom elements. To avoid 
 naming conflicts the custom elements of a plugin should be unique and contain the plugin name.
 
-A Plugin shoud be an encasulated web component. [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM)
+A plugin should be an encapsulated web component. [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM)
 is the perfect tool to encapsulate your plugin:
 
 ```Javascript
@@ -132,10 +132,10 @@ to allow the custom event to trigger listeners outside of the shadow dom.
 
 #### Attributes
 
-The custom element in some [hooks](#hooks-extension-points) receive context information by custom attributes like the id 
-of the member which is displayed in the `member-dialog-sidbar` extention point or the id of the active period in the 
-`accounting-panel-navigation` extention point. All attributes are reactive, which means if the underlying property changes, 
-the attributes is updated:
+The custom element in some [hooks](#hooks-extension-points) receive context information by custom attributes. This can be the id 
+of the member which is displayed in the `member-dialog-sidbar` extension point or the id of the active period in the 
+`accounting-panel-navigation` extension point. All attributes are reactive and are updated when the underlying property changes. 
+You can watch for attribute changes with the `attributeChangedCallback` function:
 
 ```javascript
 class PluginMemberDialogSidebar extends HTMLElement {
@@ -162,7 +162,7 @@ extension point (called hook) and all needed context information.
 
 Webling provides the following hooks for extension:
 
-### The Plugin configuration Dialog
+### The plugin configuration dialog
 
 Hook Name: `plugin-config`
 
@@ -180,9 +180,9 @@ This hook allows the plugin to provide a configuration dialog. An example of a c
 
 #### Events
 
-- `close-dialog`: close the config dialog
+- `close-dialog`: closes the config dialog
 
-### Add a Page to the Member Panel
+### Add a page to the member panel
 
 Hook Name: `member-panel-navigation`
 
@@ -213,8 +213,8 @@ with this hook you can extend the member grid with a custom dialog.
     hook: 'member-grid-menu',
     label: 'My Plugin Gird Export', // the label of the grid menu item, which is shown in the member grid. 
     tagName: 'plugin-my-custom-element', // the name of the custom element representing the new page.
-    dialogTitle: 'My Plugin Export dialog', // optional title for the dialog. If no title is provided, the label is displayd
-    dialogWidth: 800 // optional with of the dialog in pixels. If no width is provided, the dialog has a with of 900 pixels. 
+    dialogTitle: 'My Plugin Export dialog', // optional title for the dialog. If no title is provided, the label is displayed.
+    dialogWidth: 800 // optional with of the dialog in pixels. If no width is provided, the dialog has a with of 900 pixels.
 }
 ```
 
@@ -225,7 +225,7 @@ The custom element is provided with two attributes containing the grid selection
 - The `member-ids` attribute contains the ids of all selected members in the grid. If no members are selected, the 
   `member-ids` attribute contains the ids of all members in the grid.
 - The `membergroup-id` attribute contains the id if the membergroup which is displayed in the grid. This attribute is only
-  available if a membergroup is displayed. If a search is executed, a saved search is shown or all members are displayed
+  available if a membergroup is displayed. If a search is executed, a saved search is shown, or all members are displayed,
   this attribute is empty.
 
 ```Javascript
@@ -243,7 +243,7 @@ class PluginMyCustomElement extends HTMLElement {
 
 ### Extend the Member Dialog Sidebar
 
-Hook Name: `member-dialog-sidbar`
+Hook Name: `member-dialog-sidebar`
 
 This hook allows the plugin to add information in the member dialog. An example of how to add the last modified time to 
 the member dialog can be found in the [member lastmodified example plugin](./examples/member-lastmodified#readme)
@@ -252,7 +252,7 @@ the member dialog can be found in the [member lastmodified example plugin](./exa
 
 ```Javascript
 {
-    hook: 'member-dialog-sidbar',
+    hook: 'member-dialog-sidebar',
     tagName: 'plugin-my-plugin-configuration' // the name of the custom element we want want to display in the member dialog
 }
 ```
@@ -328,6 +328,12 @@ After a Webling plugin is imported, the `onLoad` callback is called. Webling pro
 The context implements the [`IWeblingPluginContext`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L79)
 interface and contains the following apis:
 
+* `instances` access data and objects in webling
+* `http` a http wrapper to access the raw webling api
+* `config` read and write plugin config
+* `state` read and write plugin state
+* `language` user selected language
+
 ### `context.instances`
 `context.instances` provides access to the actual data saved in Webling like members, entries or documents. The properties 
 of the different instances and the connections between the instances are described in the [Webling API
@@ -339,7 +345,7 @@ interface. The interface also contains a list of the names of all object types.
 Loaded instances are returned implementing the [`IWeblingPluginInstanceData`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPluginInstanceData.ts#L6)
 interface and instance updates must be of the form [`IWeblingPluginInstanceUpdate`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPluginInstanceUpdate.ts#L6).
 
-Each instance type type proides the following methods:
+Each instance type type provides the following methods:
 
 - The `load(id: number): Promise<IWeblingPluginInstanceData>` method loads an instance from the webling backend. 
 
@@ -348,8 +354,8 @@ Each instance type type proides the following methods:
   const memberLabel = member.label;
   ```
 
-- The `watch(id: number, watcher: () => void): () => void` method allowes to watch a specific instance. The watcher is 
-  triggered if the instance has changed. Changes can come from this or another plugin, the webling client itself of a 
+- The `watch(id: number, watcher: () => void): () => void` method allows to watch a specific instance. The watcher is 
+  triggered if the instance has changed. Changes can come from this or another plugin, the webling client itself or a 
   change from another user. The `watch` method returns a callback to stop watching the instance.
 
   ```javascript
@@ -367,9 +373,9 @@ Each instance type type proides the following methods:
   - If a `options.filter` is passed, only the instances are returned which satisfies the filter. The query language used
     to filter the instances is described in the [Query Language](https://demo.webling.ch/api/1#header-query-language) Section
     of the [Webling API Documentation](https://demo.webling.ch/api/1).
-  - If a `options.order` is passed, the result is orderd accordingly. E.g. if the `options.order` array is 
-    `['Vorname DESC', 'Nachname ASC']` the result is first orderd by `Vorname` descending and instances with equal
-    `Vorname` properties are orderd `Nachname` ascending. All path expressions from the [Query Language](https://demo.webling.ch/api/1#header-query-language)
+  - If a `options.order` is passed, the result is ordered accordingly. E.g. if the `options.order` array is 
+    `['Vorname DESC', 'Nachname ASC']` the result is first ordered by `Vorname` descending and instances with equal
+    `Vorname` properties are ordered `Nachname` ascending. All path expressions from the [Query Language](https://demo.webling.ch/api/1#header-query-language)
     can be used to sort the results. 
     
   Get all members in the group `Junioren`, which are older than 17 and sort the result by birth year 
@@ -383,7 +389,7 @@ Each instance type type proides the following methods:
 - The `listIds(options?: { filter?: string; order?: string[] }): Promise<number[]>` method is the same as the `list` method, 
   but it returns only the ids of the matching instances.
 
-  Get all members which have an open debitor and are in a supgroup of `Aktive`, orderd by the remaining amount of the debitor
+  Get all members which have an open debitor and are in a subgroup of `Aktive`, ordered by the remaining amount of the debitor
   ```javascript
   const memberIds = await context.instances.member.list({ 
       filter: '$links.debitor.state="open" AND $ancestors.$label = `Aktive`',
@@ -391,9 +397,9 @@ Each instance type type proides the following methods:
   });
   ```
 
-- The `watchAll(watcher: () => void): () => void` method allowes to watch the list of all instances. The watcher is 
+- The `watchAll(watcher: () => void): () => void` method allows to watch the list of all instances. The watcher is 
   triggered if an instance is created, an instance is deleted or if the order of the list has changed. Changes can come 
-  from this or another plugin, the webling client itself of a change from another user. The `watchAll` methode returns a 
+  from this or another plugin, the webling client itself or a change from another user. The `watchAll` method returns a 
   callback to stop watching the list.
 
   ```javascript
@@ -442,7 +448,7 @@ Each instance type type proides the following methods:
   ```
 
 ### `context.http`
-Since the plugins are loaded from a different origin than Webling the plugin cannot send a fetch request to the webling
+Since the plugins are loaded from a different origin than Webling, the plugin cannot send a fetch request to the webling
 backend. Through `context.http` the plugin can send http requests to the webling backend. `context.http` implements the [`IWeblingPluginHttp`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L62)
 interface.
 
@@ -475,7 +481,7 @@ must be a serializable object. The plugin configuration should be managed in an 
 `context.config` implements the [`IWeblingPluginConfig`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L69)
 interface 
 
-The plugin configuration is only writable by the administrator of the Webling Account, but readable for every user.
+The plugin configuration is only writable by an administrator, but readable for every user.
 
 - The method `get(): Object` returns the current configuration object.
 
@@ -544,8 +550,8 @@ If you write a plugin in typescript you can install the webling typings with
 
 ## Plugin Hosting
 
-Since a Plugin must be publicly available, we recommend hosting Webling plugins on GitHub. Since GitHub is not a content
-delivery network, you need a cdn to deliver your plugin with the correct headers. You can use [raw.githack.com](https://raw.githack.com/).
+Since a plugin must be publicly available, we recommend hosting Webling plugins on GitHub. Since GitHub is not a content
+delivery network, you need a CDN to deliver your plugin with the correct headers. You can use [raw.githack.com](https://raw.githack.com/).
 A more detailed explanation on how to deliver your plugin correctly look at this [medium post](https://lukasgamper.medium.com/how-to-import-files-directly-from-github-1a41c72a3ad3).
 
 ## How to install and manage your Webling Plugins
@@ -556,7 +562,7 @@ A Webling plugin can be installed in the Webling Administration under `Administr
 
 ### [Member Map](./examples/member-map#readme)
 
-An example plugins which shows how to visualize all members on a Google map directly in webling itself.
+An example plugins which shows how to visualize all members on a Google map.
 
 ### [Member Lastmodified](./examples/member-lastmodified#readme)
 
