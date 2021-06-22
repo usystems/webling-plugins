@@ -334,7 +334,7 @@ interface and contains the following apis:
 * `state` read and write plugin state
 * `language` user selected language
 
-### `context.instances`
+### context.instances
 `context.instances` provides access to the actual data saved in Webling like members, entries or documents. The properties 
 of the different instances and the connections between the instances are described in the [Webling API
 Documentation](https://demo.webling.ch/api/1).
@@ -447,7 +447,7 @@ Each instance type type provides the following methods:
   await Promise.all(unusedDocuments.map(async documentId => context.instances.document.delete(documentId)));
   ```
 
-### `context.http`
+### context.http
 Since the plugins are loaded from a different origin than Webling, the plugin cannot send a fetch request to the webling
 backend. Through `context.http` the plugin can send http requests to the webling backend. `context.http` implements the [`IWeblingPluginHttp`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L62)
 interface.
@@ -471,7 +471,7 @@ interface.
 
 - The method `delete(url: string): Promise` sends a delete request to the Webling backend and resolves with the response.
 
-### `context.config`
+### context.config
 
 `context.config` provides access to the plugin configuration. If the plugin needs specific data like API keys for
 Google Maps, or some formatting options, you should store these in the configuration object. The configuration
@@ -496,7 +496,7 @@ The plugin configuration is only writable by an administrator, but readable for 
   await context.config.set({ ...currentConfig, apiKey: newGoogleMapsApiKey });
   ```
 
-### `context.state`
+### context.state
 
 `context.state` provides access to the plugin state. The state can be any serializable object. In contrast to the
 configuration it can be read and written by all users.
@@ -517,7 +517,7 @@ interface
   await context.state.set({ ...state, note: newNote });
   ```
 
-### `context.language`
+### context.language
 
 The language, the Webling user is using. The following languages are possible:
 
