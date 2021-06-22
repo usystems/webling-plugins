@@ -55,7 +55,7 @@ export interface IWeblingPluginInstances {
 	template: IWeblingPluginInstance;
 	user: IWeblingPluginInstance;
 	usergroup: IWeblingPluginInstance;
-	// fallback to stay compatible with instance types introduces in the future
+	// fallback to stay compatible with instance types introduced in the future
 	[instanceType: string]: IWeblingPluginInstance;
 }
 
