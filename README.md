@@ -67,26 +67,26 @@ The plugin must be a valid ES Module. The plugin configuration is an object expo
 [`IWeblingPlugin`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L87) interface. It must 
 contain the following keys:
 
-- `name`: String
+* `name`: String
 
     Every plugin must have a unique name. We recommend using the [Reverse Domain Name Notaion](https://en.wikipedia.org/wiki/Reverse_domain_name_notation)
     to make clear where the plugin comes from.
 
-- `apiversion`: Number
+* `apiversion`: Number
 
     A plugin must specify with which version of the API it is compatible. Currently, only the version `1` is supported.
     
-- `pluginversion`: String
+* `pluginversion`: String
 
     We recommend versioning the plugin using [Semantic Versioning](https://semver.org).
     
-- `hooks`: Array
+* `hooks`: Array
 
     The hooks array specifies how the plugin extends Webling. In the example above, the tag `plugin-hello-world`
     is inserted into the member panel. In the navigation a new menu item with the label `Hello World` is displayed. 
     Every hook has different options. The hooks are described in [extension points](#hooks-extension-points)
 
-- `onLoad`: Function
+* `onLoad`: Function
 
     After Webling is loaded, all plugins are dynamically imported and the `onLoad` function of each plugin is called. The `onLoad`
     function gets the plugin context as an argument. The context is described in [The Plugin Context](#the-plugin-context).
@@ -180,7 +180,7 @@ This hook allows the plugin to provide a configuration dialog. An example of a c
 
 #### Events
 
-- `close-dialog`: closes the config dialog
+* `close-dialog`: closes the config dialog
 
 ### Add a page to the member panel
 
@@ -222,9 +222,9 @@ with this hook you can extend the member grid with a custom dialog.
 
 The custom element is provided with two attributes containing the grid selection and the membergroup which is displayed:
 
-- The `member-ids` attribute contains the ids of all selected members in the grid. If no members are selected, the 
+* The `member-ids` attribute contains the ids of all selected members in the grid. If no members are selected, the 
   `member-ids` attribute contains the ids of all members in the grid.
-- The `membergroup-id` attribute contains the id if the membergroup which is displayed in the grid. This attribute is only
+* The `membergroup-id` attribute contains the id if the membergroup which is displayed in the grid. This attribute is only
   available if a membergroup is displayed. If a search is executed, a saved search is shown, or all members are displayed,
   this attribute is empty.
 
@@ -328,11 +328,11 @@ After a Webling plugin is imported, the `onLoad` callback is called. Webling pro
 The context implements the [`IWeblingPluginContext`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L79)
 interface and contains the following apis:
 
-* `instances` access data and objects in webling
-* `http` a http wrapper to access the raw webling api
-* `config` read and write plugin config
-* `state` read and write plugin state
-* `language` user selected language
+* [`instances`](#contextinstances) access data and objects in webling
+* [`http`](#contexthttp) a http wrapper to access the raw webling api
+* [`config`](#contextconfig) read and write plugin config
+* [`state`](#contextstate) read and write plugin state
+* [`language`](#contextlanguage) user selected language
 
 ### `context.instances`
 `context.instances` provides access to the actual data saved in Webling like members, entries or documents. The properties 
@@ -347,14 +347,14 @@ interface and instance updates must be of the form [`IWeblingPluginInstanceUpdat
 
 Each instance type type provides the following methods:
 
-- The `load(id: number): Promise<IWeblingPluginInstanceData>` method loads an instance from the webling backend. 
+* The `load(id: number): Promise<IWeblingPluginInstanceData>` method loads an instance from the webling backend. 
 
   ```javascript
   const member = await context.instances.member.load(554);
   const memberLabel = member.label;
   ```
 
-- The `watch(id: number, watcher: () => void): () => void` method allows to watch a specific instance. The watcher is 
+* The `watch(id: number, watcher: () => void): () => void` method allows to watch a specific instance. The watcher is 
   triggered if the instance has changed. Changes can come from this or another plugin, the webling client itself or a 
   change from another user. The `watch` method returns a callback to stop watching the instance.
 
@@ -367,7 +367,7 @@ Each instance type type provides the following methods:
   });
   ```
 
-- The `list(options?: { filter?: string; order?: string[] }): Promise<IWeblingPluginInstanceData[]>` method returns
+* The `list(options?: { filter?: string; order?: string[] }): Promise<IWeblingPluginInstanceData[]>` method returns
   a list of instances.
   - If no options are passed, all instances of this type are loaded and returned.
   - If a `options.filter` is passed, only the instances are returned which satisfies the filter. The query language used
@@ -386,7 +386,7 @@ Each instance type type provides the following methods:
   });
     ```    
   
-- The `listIds(options?: { filter?: string; order?: string[] }): Promise<number[]>` method is the same as the `list` method, 
+* The `listIds(options?: { filter?: string; order?: string[] }): Promise<number[]>` method is the same as the `list` method, 
   but it returns only the ids of the matching instances.
 
   Get all members which have an open debitor and are in a subgroup of `Aktive`, ordered by the remaining amount of the debitor
@@ -397,7 +397,7 @@ Each instance type type provides the following methods:
   });
   ```
 
-- The `watchAll(watcher: () => void): () => void` method allows to watch the list of all instances. The watcher is 
+* The `watchAll(watcher: () => void): () => void` method allows to watch the list of all instances. The watcher is 
   triggered if an instance is created, an instance is deleted or if the order of the list has changed. Changes can come 
   from this or another plugin, the webling client itself or a change from another user. The `watchAll` method returns a 
   callback to stop watching the list.
@@ -413,7 +413,7 @@ Each instance type type provides the following methods:
   });
   ```
 
-- The `create(instance: IWeblingPluginInstanceUpdate): Promise<number>` method creates a new instance.
+* The `create(instance: IWeblingPluginInstanceUpdate): Promise<number>` method creates a new instance.
 
   ```javascript
   const newMembergroupId = await context.instances.membergroup.create({
@@ -427,7 +427,7 @@ Each instance type type provides the following methods:
   });
   ```
     
-- The `update(id: number, update: IWeblingPluginInstanceUpdate): Promise<void>` method updates the properties, links,
+* The `update(id: number, update: IWeblingPluginInstanceUpdate): Promise<void>` method updates the properties, links,
   children or parents of an instance.
 
   ```javascript
@@ -438,7 +438,7 @@ Each instance type type provides the following methods:
   });
   ```
 
-- The `delete(id: number): Promise<void>` method deletes an instance.
+* The `delete(id: number): Promise<void>` method deletes an instance.
 
   ```javascript
   const unusedDocuments = await context.instances.document.listIds({ 
@@ -452,13 +452,13 @@ Since the plugins are loaded from a different origin than Webling, the plugin ca
 backend. Through `context.http` the plugin can send http requests to the webling backend. `context.http` implements the [`IWeblingPluginHttp`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L62)
 interface.
 
-- The method `get(url: string): Promise` sends a get request to the Webling backend and resolves with the response.
+* The method `get(url: string): Promise` sends a get request to the Webling backend and resolves with the response.
 
   ```javascript
   const monthlyStats = await context.http.get('period/2230/monthlystats');
   ```
 
-- The method `post(url: string, data?: any): Promise` sends a post request to the Webling backend and resolves with the response.
+* The method `post(url: string, data?: any): Promise` sends a post request to the Webling backend and resolves with the response.
 
   ```javascript
   const duplicateMembers = await context.http.post(
@@ -467,9 +467,9 @@ interface.
   );
   ```
 
-- The method `put(url: string, data?: any): Promise` sends a put request to the Webling backend and resolves with the response.
+* The method `put(url: string, data?: any): Promise` sends a put request to the Webling backend and resolves with the response.
 
-- The method `delete(url: string): Promise` sends a delete request to the Webling backend and resolves with the response.
+* The method `delete(url: string): Promise` sends a delete request to the Webling backend and resolves with the response.
 
 ### `context.config`
 
@@ -483,13 +483,13 @@ interface
 
 The plugin configuration is only writable by an administrator, but readable for every user.
 
-- The method `get(): Object` returns the current configuration object.
+* The method `get(): Object` returns the current configuration object.
 
   ```javascript
   const googleMapsApiKey = context.config.get().apiKey;
   ```
 
-- And the configuration can be updated with the `set(config: Object): Promise` method. The returned promise resolves if 
+* And the configuration can be updated with the `set(config: Object): Promise` method. The returned promise resolves if 
   the configuration is saved to the webling backend.
 
   ```javascript
@@ -504,13 +504,13 @@ configuration it can be read and written by all users.
 `context.state` implements the [`IWeblingPluginState`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L74)
 interface 
 
-- The method `get(): Object` returns the current state of the plugin.
+* The method `get(): Object` returns the current state of the plugin.
 
   ```javascript
   const note = context.state.get().note;
   ```
 
-- And the state can be updated with the `set(config: Object): Promise` method. The returned promise resolves if 
+* And the state can be updated with the `set(config: Object): Promise` method. The returned promise resolves if 
   the state is saved to the webling backend.
 
   ```javascript
@@ -521,9 +521,9 @@ interface
 
 The language, the Webling user is using. The following languages are possible:
 
-- `de`(German) This is the default language of the vast majority of users.
-- `en`(English)
-- `fr`(French)
+* `de`(German) This is the default language of the vast majority of users.
+* `en`(English)
+* `fr`(French)
 
 ```javascript
 const currentLanguage = context.language;
