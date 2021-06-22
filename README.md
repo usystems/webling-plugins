@@ -493,7 +493,7 @@ The plugin configuration is only writable by an administrator, but readable for 
   the configuration is saved to the webling backend.
 
   ```javascript
-  await context.config.set({ ...currentConfig, apiKey: newGoogleMapsApiKey });
+  await context.config.set({ apiKey: newGoogleMapsApiKey });
   ```
 
 ### `context.state`
@@ -514,6 +514,7 @@ interface
   the state is saved to the webling backend.
 
   ```javascript
+  const state = context.state.get();
   await context.state.set({ ...state, note: newNote });
   ```
 
