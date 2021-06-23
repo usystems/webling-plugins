@@ -1,10 +1,10 @@
 {
-  "name": "member-lastmodified-webling-plugin",
+  "name": "member-map-webling-plugin",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "browser-sync start --server --port 4004 --cors --no-open --files '*.js'"
+    "start": "node_modules/.bin/browser-sync start --server --port 4004 --cors --no-open --files '*.js'"
   },
   "repository": {
     "type": "git",

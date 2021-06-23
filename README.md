@@ -18,7 +18,7 @@ The Webling plugin system is not publicly available yet. If you are interested i
 1. [Plugin Development](#plugin-development)
 1. [Plugin Hosting](#plugin-hosting)
 1. [How to install and manage your Webling Plugins](#how-to-install-and-manage-your-webling-plugins)
-1. [Tutorial](#tutorial)
+1. [Tutorial](#tutorials)
 1. [Example Plugins](#example-plugins)
 
 ## How does a Webling plugin work
@@ -168,7 +168,7 @@ Webling provides the following hooks for extension:
 Hook Name: `plugin-config`
 
 This hook allows the plugin to provide a configuration dialog. An example of a configuration dialog can be found here:
-[member map example plugin](./examples/member-map#readme)
+[member map example plugin](./tutorial/2-member-map#readme)
 
 #### Options
 
@@ -562,15 +562,25 @@ A Webling plugin can be installed in the Webling Administration under `Administr
 
 ## Tutorials
 
-### Build a plain HTML and JavaScript plugin to extend the Sidebar of the Member Dialog
+### A simple plugin to display the last modification time in the Member Dialog
 
-The [Member Lastmodified](./tutorial/1-member-lastmodified#readme) plugin is a simple plugin, which add the last
-modification time to the sibebar of the memberdialog. This tutorial shows how to create a plugin without any dependancies 
-just using javascript and html.
+Tutorial: [Member Lastmodified](./tutorial/1-member-lastmodified#readme)
 
-### [Member Map](./examples/member-map#readme)
+In this tutorial we will build a simple plugin without any dependencies. We will extend the sidebar of the member
+dialog to show the last modification of the member. The [Member Lastmodified](./tutorial/1-member-lastmodified#readme)
+is a good startingpoint if you want to write a webling plugin.
 
-An example plugins which shows how to visualize all members on a Google Map.
+### Using VueJS and Google Maps to display all Members on a Map
+
+Tutorial: [Member Map](./tutorial/2-member-map#readme)
+
+This tutorial is a bit more complex. We use VueJs from a CDN to build a configuration dialog for the Gootle Maps API Key.
+With Google Maps API we create a new page in the member panel and extend the member grid with a action which shows all
+members on Google Maps. In this tutor
+
+### 3rd tutorial
+
+TBD
 
 ## Example Plugins
 

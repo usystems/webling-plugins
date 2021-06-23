@@ -1,6 +1,3 @@
-/**
- * @type IWeblingPluginInstances
- */
 let weblingInstances;
 
 class PluginMemberLastmodified extends HTMLElement {
@@ -40,9 +37,6 @@ async function updateElement(el) {
 	}
 }
 
-/**
- * @type IWeblingPlugin
- */
 export default {
 	name: 'com.webling.plugin.member-lastmodified',
 	apiversion: 1,
@@ -51,9 +45,6 @@ export default {
 		hook: 'member-dialog-sidebar',
 		tagName: 'plugin-member-lastmodified'
 	}],
-	/**
-	 * @param context IWeblingPluginContext
-	 */
 	async onLoad(context) {
 		weblingInstances = context.instances;
 		customElements.define('plugin-member-lastmodified', PluginMemberLastmodified);
