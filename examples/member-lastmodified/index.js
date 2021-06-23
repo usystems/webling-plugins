@@ -1,7 +1,7 @@
 /**
  * @type IWeblingPluginInstances
  */
-let instances;
+let weblingInstances;
 
 class PluginMemberLastmodified extends HTMLElement {
 
@@ -13,7 +13,7 @@ class PluginMemberLastmodified extends HTMLElement {
 		this.shadowRoot.innerHTML = `
 			<link href="/css/plugins.css" rel="stylesheet">
 			<h2>Zuletzt geändert</h2> 
-			<div class="time"></div>
+			<div id="lastmodified"></div>
 		`;
 	}
 
@@ -27,12 +27,12 @@ class PluginMemberLastmodified extends HTMLElement {
 }
 
 async function updateElement(el) {
-	let memberId = el.getAttribute('member-id');
-	if (/^[1-9]\d*$/.test(memberId)) {
-		let member = await instances.member.load(parseInt(memberId, 10));
+	let memberId = parseInt(el.getAttribute('member-id'), 10);
+	if (!isNaN(memberId) && memberId !== 0) {
+		let member = await weblingInstances.member.load(memberId);
 		let lastmodified = member.meta.lastmodified;
 		if (lastmodified instanceof Date) {
-			el.shadowRoot.querySelector('.time').textContent = lastmodified.toLocaleDateString(
+			el.shadowRoot.querySelector('#lastmodified').textContent = lastmodified.toLocaleDateString(
 				'de-ch',
 				{ year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }
 			);
@@ -40,6 +40,9 @@ async function updateElement(el) {
 	}
 }
 
+/**
+ * @type IWeblingPlugin
+ */
 export default {
 	name: 'com.webling.plugin.member-lastmodified',
 	apiversion: 1,
@@ -48,8 +51,11 @@ export default {
 		hook: 'member-dialog-sidebar',
 		tagName: 'plugin-member-lastmodified'
 	}],
+	/**
+	 * @param context IWeblingPluginContext
+	 */
 	async onLoad(context) {
-		instances = context.instances;
+		weblingInstances = context.instances;
 		customElements.define('plugin-member-lastmodified', PluginMemberLastmodified);
 	}
 }

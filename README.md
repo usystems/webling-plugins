@@ -18,6 +18,7 @@ The Webling plugin system is not publicly available yet. If you are interested i
 1. [Plugin Development](#plugin-development)
 1. [Plugin Hosting](#plugin-hosting)
 1. [How to install and manage your Webling Plugins](#how-to-install-and-manage-your-webling-plugins)
+1. [Tutorial](#tutorial)
 1. [Example Plugins](#example-plugins)
 
 ## How does a Webling plugin work
@@ -246,7 +247,7 @@ class PluginMyCustomElement extends HTMLElement {
 Hook Name: `member-dialog-sidebar`
 
 This hook allows the plugin to add information in the member dialog. An example of how to add the last modified time to 
-the member dialog can be found in the [member lastmodified example plugin](./examples/member-lastmodified#readme)
+the member dialog can be found in the [member lastmodified example plugin](./tutorial/1-member-lastmodified#readme)
 
 #### Options
 
@@ -559,12 +560,20 @@ A more detailed explanation on how to deliver your plugin correctly look at this
 
 A Webling plugin can be installed in the Webling Administration under `Administration` » `Integrationen` » `Plugins`.
 
-## Example Plugins
+## Tutorials
+
+### Build a plain HTML and JavaScript plugin to extend the Sidebar of the Member Dialog
+
+The [Member Lastmodified](./tutorial/1-member-lastmodified#readme) plugin is a simple plugin, which add the last
+modification time to the sibebar of the memberdialog. This tutorial shows how to create a plugin without any dependancies 
+just using javascript and html.
 
 ### [Member Map](./examples/member-map#readme)
 
-An example plugins which shows how to visualize all members on a Google map.
+An example plugins which shows how to visualize all members on a Google Map.
 
-### [Member Lastmodified](./examples/member-lastmodified#readme)
+## Example Plugins
 
-A plugin which adds the last modification time to the member dialog.
+### [Google Calendar](./examplles/google-calendar)
+
+A plugin which displays a Google Calendar in the member panel
