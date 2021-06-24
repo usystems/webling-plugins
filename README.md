@@ -168,7 +168,7 @@ Webling provides the following hooks for extension:
 Hook Name: `plugin-config`
 
 This hook allows the plugin to provide a configuration dialog. An example of a configuration dialog can be found here:
-[member map example plugin](./tutorial/2-member-map#readme)
+[member map example plugin](./tutorials/2-member-map#readme)
 
 #### Options
 
@@ -247,7 +247,7 @@ class PluginMyCustomElement extends HTMLElement {
 Hook Name: `member-dialog-sidebar`
 
 This hook allows the plugin to add information in the member dialog. An example of how to add the last modified time to 
-the member dialog can be found in the [member lastmodified example plugin](./tutorial/1-member-lastmodified#readme)
+the member dialog can be found in the [member lastmodified example plugin](./tutorials/1-member-lastmodified#readme)
 
 #### Options
 
@@ -564,15 +564,15 @@ A Webling plugin can be installed in the Webling Administration under `Administr
 
 ### A simple plugin to display the last modification time in the Member Dialog
 
-Tutorial: [Member Lastmodified](./tutorial/1-member-lastmodified#readme)
+Tutorial: [Member Lastmodified](./tutorials/1-member-lastmodified#readme)
 
 In this tutorial we will build a simple plugin without any dependencies. We will extend the sidebar of the member
-dialog to show the last modification of the member. The [Member Lastmodified](./tutorial/1-member-lastmodified#readme)
+dialog to show the last modification of the member. The [Member Lastmodified](./tutorials/1-member-lastmodified#readme)
 is a good startingpoint if you want to write a webling plugin.
 
 ### Using VueJS and Google Maps to display all Members on a Map
 
-Tutorial: [Member Map](./tutorial/2-member-map#readme)
+Tutorial: [Member Map](./tutorials/2-member-map#readme)
 
 This tutorial is a bit more complex. We use VueJs from a CDN to build a configuration dialog for the Gootle Maps API Key.
 With Google Maps API we create a new page in the member panel and extend the member grid with a action which shows all
