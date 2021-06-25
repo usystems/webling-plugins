@@ -1,6 +1,19 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import css from './style.css';
 
+let styleElement: HTMLStyleElement | null = null;
+if (import.meta.hot) {
+	const styleElements: HTMLStyleElement[] = <HTMLStyleElement[]>[...<any>document.head.children]
+		.filter(node => node.nodeType === 1 && node.nodeName.toLowerCase() === 'style')
+		.filter(node => node.innerHTML === css);
+	if (styleElements.length === 1) {
+		styleElement = styleElements[0];
+		if (styleElement.parentElement instanceof HTMLElement) {
+			styleElement.parentElement.removeChild(styleElement);
+		}
+	}
+}
 
 class PluginCostcenterOverview extends HTMLElement {
 	constructor() {
@@ -10,7 +23,23 @@ class PluginCostcenterOverview extends HTMLElement {
 
 	connectedCallback() {
 		if (this.isConnected) {
-			createApp(App).mount(<any>this.shadowRoot);
+
+			const shadowRootAsEl: HTMLElement = <any>this.shadowRoot;
+			createApp(App).mount(shadowRootAsEl);
+
+			if (import.meta.hot) {
+				if (styleElement !== null) {
+					if (styleElement.parentElement instanceof HTMLElement) {
+						styleElement.parentElement.removeChild(styleElement);
+					}
+					shadowRootAsEl.appendChild(styleElement);
+				}
+			} else {
+				styleElement = document.createElement('style');
+				styleElement.setAttribute('type', 'text/css');
+				styleElement.innerHTML = css;
+				shadowRootAsEl.appendChild(styleElement);
+			}
 		}
 	}
 }

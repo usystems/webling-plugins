@@ -1,4 +1,5 @@
 <template>
+	<link href="/css/plugins.css" rel="stylesheet">
 	<div id="my-app">
   <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" />
 	</div>
@@ -15,14 +16,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<style>
-#my-app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
