@@ -8,5 +8,5 @@ how to write a Webling Plugin can be found in [Webling Plugin GitHub Repo](https
 
 ## The Webling Plugin Format
 
-A Webling Plugin is a ES Module, which default exports an object which implements the [`IWeblingPlugin`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L87)
+A Webling Plugin is a ES Module, which default exports an object which implements the [`IWeblingPlugin`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L96)
 interface. For more information look at the [documentation of the plugin configuration](https://github.com/usystems/webling-plugins#the-plugin-configuration) 

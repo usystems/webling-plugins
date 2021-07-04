@@ -69,11 +69,19 @@ export interface IWeblingPluginHttp {
 export interface IWeblingPluginConfig {
 	get(): { [key: string]: any };
 	set(config: { [key: string]: any }): Promise<void>;
+	watch(watcher: () => void): () => void;
 }
 
 export interface IWeblingPluginState {
 	get(): any;
 	set(state: any): Promise<void>;
+	watch(watcher: () => void): () => void;
+}
+
+export interface IWeblingPluginPrefs {
+	get(): any;
+	set(prefs: any): Promise<void>;
+	watch(watcher: () => void): () => void;
 }
 
 export interface IWeblingPluginContext {
@@ -81,6 +89,7 @@ export interface IWeblingPluginContext {
 	http: IWeblingPluginHttp;
 	config: IWeblingPluginConfig;
 	state: IWeblingPluginState;
+	prefs: IWeblingPluginPrefs;
 	language: 'de' | 'en' | 'fr';
 }
 
@@ -90,17 +99,17 @@ export default interface IWeblingPlugin {
 	pluginversion: string;
 	hooks: ({
 		hook: 'member-panel-navigation' | 'accounting-panel-navigation' | 'document-panel-navigation';
-		label: string;
-		tagName: string;
+		label: string | (() => string);
+		element: { new (...params: any[]): HTMLElement };
 	} | {
 		hook: 'member-dialog-sidebar' | 'plugin-config';
-		tagName: string;
+		element: { new (...params: any[]): HTMLElement };
 	} | {
 		hook: 'member-grid-menu';
-		label: string;
-		tagName: string;
+		label: string | (() => string);
+		element: { new (...params: any[]): HTMLElement };
 		dialogTitle?: string;
 		dialogWidth?: number;
 	})[];
-	onLoad(context: IWeblingPluginContext): void | Promise<void>;
+	onLoad?(context: IWeblingPluginContext): void | Promise<void>;
 }
