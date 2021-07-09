@@ -139,7 +139,7 @@ class SportdbExportDialog extends HTMLElement {
 
 export default {
 	name: 'com.webling.plugin.sportdb-export',
-	apiversion: 1,
+	apiversion: 2,
 	pluginversion: '1.0.0',
 	hooks: [{
 		hook: 'member-grid-menu',

@@ -95,7 +95,7 @@ export interface IWeblingPluginContext {
 
 export default interface IWeblingPlugin {
 	name: string;
-	apiversion: 1;
+	apiversion: 1 | 2;
 	pluginversion: string;
 	hooks: ({
 		hook: 'member-panel-navigation' | 'accounting-panel-navigation' | 'document-panel-navigation';

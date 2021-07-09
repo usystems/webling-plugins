@@ -182,7 +182,7 @@ class PluginGoogleCalendarConfig extends HTMLElement {
 
 export default {
 	name: 'com.webling.plugin.google-calendar',
-	apiversion: 1,
+	apiversion: 2,
 	pluginversion: '1.0.0',
 	hooks: [{
 		hook: 'plugin-config',

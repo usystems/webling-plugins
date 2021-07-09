@@ -37,7 +37,7 @@ Svelte or whatever you like.
 Every programming tutorial must have a hello world example. Let's look at the hello world Webling plugin:
 
 ```Javascript
-class PluginHelloWorld extends HTMLElement {
+class HelloWorld extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -47,16 +47,13 @@ class PluginHelloWorld extends HTMLElement {
 
 export default {
     name: 'com.webling.plugin.hello-world',
-    apiversion: 1,
+    apiversion: 2,
     pluginversion: '1.0.0',
     hooks: [{
         hook: 'member-panel-navigation',
         label: 'Hello World',
-        tagName: 'plugin-hello-world'
-    }],
-    onLoad(context) {
-        customElements.define('plugin-hello-world', PluginHelloWorld);
-    }
+        element: HelloWorld
+    }]
 }
 ```
 
@@ -65,7 +62,7 @@ A Webling plugin consists of two parts: the _configuration_ and the _custom elem
 ## The Plugin configuration
 
 The plugin must be a valid ES Module. The plugin configuration is an object exported as default and must implement the 
-[`IWeblingPlugin`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L87) interface. It must 
+[`IWeblingPlugin`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L96) interface. It must 
 contain the following keys:
 
 * `name`: String
@@ -75,7 +72,7 @@ contain the following keys:
 
 * `apiversion`: Number
 
-    A plugin must specify with which version of the API it is compatible. Currently, only the version `1` is supported.
+    A plugin must specify with which version of the API it is compatible. Version `2` is the current version, version `1` is deprecated.
     
 * `pluginversion`: String
 
@@ -83,30 +80,26 @@ contain the following keys:
     
 * `hooks`: Array
 
-    The hooks array specifies how the plugin extends Webling. In the example above, the tag `plugin-hello-world`
+    The hooks array specifies how the plugin extends Webling. In the example above, the element `HelloWorld`
     is inserted into the member panel. In the navigation a new menu item with the label `Hello World` is displayed. 
     Every hook has different options. The hooks are described in [extension points](#hooks-extension-points)
 
-* `onLoad`: Function
+* `onLoad`: Function, Optional
 
-    After Webling is loaded, all plugins are dynamically imported and the `onLoad` function of each plugin is called. The `onLoad`
-    function gets the plugin context as an argument. The context is described in [The Plugin Context](#the-plugin-context).
-    
-    The `onLoad` callback should register all custom elements provided in the hooks.
+    This lifecycle hook is optional. After Webling is loaded, all plugins are dynamically imported and the `onLoad` 
+    function of each plugin is called if it is provided. The `onLoad` function gets the plugin context as an argument. 
+    The context is described in [The Plugin Context](#the-plugin-context).
     
     The `onLoad` function can return a Promise if it needs to execute asynchronous actions.
 
 ## The Custom Elements 
 
 Plugins can extend webling by registering native [custom elements](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements). 
-All custom elements provided by a plugin must start with `plugin-` to be recognised as native custom elements. To avoid 
-naming conflicts the custom elements of a plugin should be unique and contain the plugin name.
-
 A plugin should be an encapsulated web component. [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM)
 is the perfect tool to encapsulate your plugin:
 
 ```Javascript
-class PluginCustomElement extends HTMLElement {
+class CustomElement extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -128,7 +121,7 @@ hook provides an event listener to close the dialog. These listeners are called 
 this.shadowRoot.dispatchEvent(new CustomEvent('close-dialog', { bubbles: true, composed: true }));
 ```
 
-Note, that the the second parameter must contain `bubbles: true` to bubble up the dom tree and [`composed: true`](https://developer.mozilla.org/en-US/docs/Web/API/Event/composed)
+Note, that the second parameter must contain `bubbles: true` to bubble up the dom tree and [`composed: true`](https://developer.mozilla.org/en-US/docs/Web/API/Event/composed)
 to allow the custom event to trigger listeners outside of the shadow dom.
 
 #### Attributes
@@ -139,7 +132,7 @@ of the member which is displayed in the `member-dialog-sidbar` extension point o
 You can watch for attribute changes with the `attributeChangedCallback` function:
 
 ```javascript
-class PluginMemberDialogSidebar extends HTMLElement {
+class MemberDialogSidebar extends HTMLElement {
     static get observedAttributes() { return ['member-id']; }
     constructor() {
         super();
@@ -172,10 +165,13 @@ This hook allows the plugin to provide a configuration dialog. An example of a c
 
 #### Options
 
+* `hook`: The name of the hook, `plugin-config`.
+* `element`: The [Custom Elements](#the-custom-elements) which should be displayed in the configuration dialog.
+
 ```Javascript
 {
     hook: 'plugin-config',
-    tagName: 'plugin-my-plugin-configuration' // the name of the custom element representing the configuration interface
+    element: PluginConfigurationCustomElement
 }
 ```
 
@@ -192,11 +188,16 @@ item to the member panel and display a custom view.
 
 #### Options
 
+* `hook`: The name of the hook, `member-panel-navigation`.
+* `label`: The label of the menu item, which is shown in the member navigation. The label can either be a string or a 
+  callback returning a string. 
+* `element`: The [Custom Elements](#the-custom-elements) which should be displayed in the member panel
+
 ```Javascript
 {
     hook: 'member-panel-navigation',
-    label: 'My Plugin Page', // the label of the menu item, which is shown in the member navigation. 
-    tagName: 'plugin-my-custom-element' // the name of the custom element representing the new page.
+    label: 'My Plugin Page', 
+    element: MemberPanelCustomElement
 }
 ```
 
@@ -209,13 +210,20 @@ with this hook you can extend the member grid with a custom dialog.
 
 #### Options
 
+* `hook`: The name of the hook, `member-grid-menu`.
+* `label`: The label of the menu item, which is shown in the member navigation. The label can either be a string or a 
+  callback returning a string. 
+* `element`: The [Custom Elements](#the-custom-elements) which should be displayed in the custom dialog.
+* `dialogTitle`: optional title of the dialog. If no title is provided, the label is displayed.
+* `dialogWidth`: optional with of the dialog in pixels. If no width is provided, the dialog has a with of 900 pixels.
+
 ```Javascript
 {
     hook: 'member-grid-menu',
-    label: 'My Plugin Gird Export', // the label of the grid menu item, which is shown in the member grid. 
-    tagName: 'plugin-my-custom-element', // the name of the custom element representing the new page.
-    dialogTitle: 'My Plugin Export dialog', // optional title for the dialog. If no title is provided, the label is displayed.
-    dialogWidth: 800 // optional with of the dialog in pixels. If no width is provided, the dialog has a with of 900 pixels.
+    label: () => 'My Plugin Gird Export', 
+    tagName: MemberGridCustomElement,
+    dialogTitle: 'My Plugin Export dialog',
+    dialogWidth: 800
 }
 ```
 
@@ -230,7 +238,7 @@ The custom element is provided with two attributes containing the grid selection
   this attribute is empty.
 
 ```Javascript
-class PluginMyCustomElement extends HTMLElement {
+class MemberGridCustomElement extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -251,10 +259,13 @@ the member dialog can be found in the [member lastmodified example plugin](./tut
 
 #### Options
 
+* `hook`: The name of the hook, `member-dialog-sidebar`.
+* `element`: The [Custom Elements](#the-custom-elements) which should be displayed in the member dialog.
+
 ```Javascript
 {
     hook: 'member-dialog-sidebar',
-    tagName: 'plugin-my-plugin-configuration' // the name of the custom element we want want to display in the member dialog
+    element: MemberDialogCustomElement
 }
 ```
 
@@ -263,7 +274,7 @@ the member dialog can be found in the [member lastmodified example plugin](./tut
 The custom element is provided with an attribute `member-id` containing the id of the member which is displayed.
 
 ```Javascript
-class PluginMyCustomElement extends HTMLElement {
+class MemberDialogCustomElement extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -283,11 +294,16 @@ item to the accounting panel and display a custom view.
 
 #### Options
 
+* `hook`: The name of the hook, `accounting-panel-navigation`.
+* `label`: The label of the menu item, which is shown in the accounting navigation. The label can either be a string or a 
+  callback returning a string. 
+* `element`: The [Custom Elements](#the-custom-elements) which should be displayed in the accounting panel
+
 ```Javascript
 {
     hook: 'accounting-panel-navigation',
-    label: 'My Plugin Page', // the label of the menu item, which is shown in the accounting navigation. 
-    tagName: 'plugin-my-custom-element' // the name of the custom element representing the new page.
+    label: 'My Plugin Page', 
+    element: AccountingPanelCustomElement
 }
 ```
 #### Attributes
@@ -295,7 +311,7 @@ item to the accounting panel and display a custom view.
 The custom element is provided with an attribute `period-id` containing the id of the active period.
 
 ```Javascript
-class PluginMyCustomElement extends HTMLElement {
+class AccountingPanelCustomElement extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -315,24 +331,30 @@ item to the document panel and display a custom view.
 
 #### Options
 
+* `hook`: The name of the hook, `document-panel-navigation`.
+* `label`: The label of the menu item, which is shown in the document navigation. The label can either be a string or a 
+  callback returning a string. 
+* `element`: The [Custom Elements](#the-custom-elements) which should be displayed in the document panel
+
 ```Javascript
 {
     hook: 'document-panel-navigation',
-    label: 'My Plugin Page', // the label of the menu item, which is shown in the member navigation. 
-    tagName: 'plugin-my-custom-element' // the name of the custom element representing the new page.
+    label: 'My Plugin Page', 
+    element: DocumentPanelCustomElement
 }
 ```
 
 ## The Plugin Context
 
 After a Webling plugin is imported, the `onLoad` callback is called. Webling provides the plugin context as the only argument.
-The context implements the [`IWeblingPluginContext`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L79)
+The context implements the [`IWeblingPluginContext`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L87)
 interface and contains the following apis:
 
 * [`instances`](#contextinstances) access data and objects in webling
 * [`http`](#contexthttp) a http wrapper to access the raw webling api
 * [`config`](#contextconfig) read and write plugin config
 * [`state`](#contextstate) read and write plugin state
+* [`prefs`](#contextprefs) read and write plugin preferences
 * [`language`](#contextlanguage) user selected language
 
 ### context.instances
@@ -497,12 +519,21 @@ The plugin configuration is only writable by an administrator, but readable for 
   await context.config.set({ apiKey: newGoogleMapsApiKey });
   ```
 
+* Configuration changes can be watched with the `watch(watcher: Function): Function` method. If the configuration changes
+  the `watcher` is called. 
+  
+  The `watch` function returns a callback to stop watching the configuration.
+
+  ```javascript
+  const off = context.config.watch(() => rerenderConfigDialg());
+  ```
+
 ### context.state
 
 `context.state` provides access to the plugin state. The state can be any serializable object. In contrast to the
 configuration it can be read and written by all users.
 
-`context.state` implements the [`IWeblingPluginState`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L74)
+`context.state` implements the [`IWeblingPluginState`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L75)
 interface 
 
 * The method `get(): Object` returns the current state of the plugin.
@@ -517,6 +548,50 @@ interface
   ```javascript
   const state = context.state.get();
   await context.state.set({ ...state, note: newNote });
+  ```
+
+* State changes can be watched with the `watch(watcher: Function): Function` method. If the state changes
+  the `watcher` is called. 
+  
+  The `watch` function returns a callback to stop watching the state.
+
+  ```javascript
+  const off = context.state.watch(() => { 
+      shadowRoot.querySelector('#note').textContent = context.state.get().note; 
+  });
+  ```
+
+### context.prefs
+
+`context.prefs` provides access to the plugin preferences. The preferences can be any serializable object. Every user
+has its own preferences. The preferences are meant to save personal settings like last used accounts.
+
+`context.prefs` implements the [`IWeblingPluginPrefs`](https://github.com/usystems/webling-plugins/blob/main/types/IWeblingPlugin.ts#L81)
+interface 
+
+* The method `get(): Object` returns the current perferences of the user.
+
+  ```javascript
+  const lastUsedAccountId = context.prefs.get().lastUsedAccountId;
+  ```
+
+* And the pereferences can be updated with the `set(prefs: Object): Promise` method. The returned promise resolves if 
+  the pereferences are saved to the webling backend.
+
+  ```javascript
+  const prefs = context.prefs.get();
+  await context.prefs.set({ ...prefs, lastUsedAccountId: newAccountId });
+  ```
+
+* Preference changes can be watched with the `watch(watcher: Function): Function` method. If the perferences changes
+  the `watcher` is called. 
+  
+  The `watch` function returns a callback to stop watching the prefs.
+
+  ```javascript
+  const off = context.prefs.watch(() => { 
+      shadowRoot.querySelector('#note').selected = context.prefs.get().lastUsedAccountId; 
+  });
   ```
 
 ### context.language
